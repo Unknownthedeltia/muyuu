@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MUYUU — Performance Options</title>
+    <title>MUYUU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@400;700;800&display=swap" rel="stylesheet">
 <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
@@ -21,7 +23,7 @@
             height: 100%;
             background-color: #020306;
             color: #e6f1ff;
-            font-family: 'Square721BT', 'Yu Gothic UI', system-ui, sans-serif;
+            font-family: 'Square721BT', 'LINE Seed JP', 'Yu Gothic UI', system-ui, sans-serif;
             overflow: hidden;
         }
         #game-wrapper {
@@ -741,7 +743,7 @@
         #game-wrapper *, .screen-overlay *, #weapon-menu *, #attachment-menu *,
         #muyuu-options-screen *, .hud-panel *, #boss-hud *, #ui-layer *,
         #stage-intro *, #gimmick-hud *, #map-transition-overlay * {
-            font-family: 'Square721BT', 'Yu Gothic UI', 'Yu Gothic', Meiryo, sans-serif !important;
+            font-family: 'Square721BT', 'LINE Seed JP', 'Yu Gothic UI', 'Yu Gothic', Meiryo, sans-serif !important;
         }
         body {
             letter-spacing: .015em;
@@ -1157,8 +1159,272 @@ body.menu-overlay-open #hud-top-left, body.menu-overlay-open #status-monitor { t
 @media(max-width:650px){.utility-overlay{padding:7px}.utility-head{padding:11px}.utility-content{padding:9px}.utility-tabs button{padding:8px 9px;font-size:12px}.utility-panel{max-height:94vh}}
 
 <style id="muyuu-v25-inventory-tab-fix">#weapon-menu .wm-tab:disabled{opacity:.28;cursor:not-allowed;filter:saturate(.35)}#weapon-menu .wm-tab:disabled:hover{border-color:rgba(148,163,184,.18);background:rgba(8,15,27,.7);color:#8a9bb4}</style>
+
+<style id="muyuu-v49-cinematic-system">
+  .muyuu-cinema{position:fixed;inset:0;z-index:1000000;overflow:hidden;background:#02040b;color:#e9f6ff;display:grid;place-items:center;opacity:1;visibility:visible;pointer-events:auto;font-family:'Square721BT','LINE Seed JP','Segoe UI',sans-serif;isolation:isolate}
+  .muyuu-cinema.is-concealed{display:none!important}
+  .muyuu-cinema.cinema-out{opacity:0;visibility:hidden;transition:opacity .82s ease,visibility .82s ease}
+  .muyuu-cinema .cine-bg{position:absolute;inset:-5%;background:radial-gradient(ellipse at 68% 43%,rgba(0,229,255,.16),transparent 34%),radial-gradient(ellipse at 24% 78%,rgba(96,60,255,.13),transparent 38%),linear-gradient(135deg,#04070d 0%,#071522 46%,#020308 100%);transform:scale(1.02);animation:cineBgDrift 12s linear infinite alternate}
+  .muyuu-cinema .cine-grid{position:absolute;inset:-20%;opacity:.2;background-image:linear-gradient(rgba(110,205,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(110,205,255,.15) 1px,transparent 1px);background-size:64px 64px;transform:perspective(800px) rotateX(60deg) translateY(20%);transform-origin:center bottom;mask-image:linear-gradient(to bottom,transparent 0%,#000 32%,#000 100%);animation:cineGridMove 18s linear infinite}
+  .muyuu-cinema .cine-scanlines{position:absolute;inset:0;pointer-events:none;opacity:.13;background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(180,235,255,.16) 4px,transparent 5px)}
+  .muyuu-cinema .cine-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 28%,rgba(0,0,0,.72) 100%)}
+  .opening-cinema .opening-layout{z-index:2;position:relative;width:min(1040px,88vw);min-height:min(650px,82vh);display:flex;flex-direction:column;justify-content:space-between;padding:clamp(24px,5vw,70px) 0}
+  .cine-eyebrow{font-family:'Square721BT','Consolas',monospace;letter-spacing:.24em;text-transform:uppercase;font-size:clamp(10px,1.1vw,13px);color:#78dbf8}
+  .opening-brand{margin-top:clamp(52px,11vh,120px);font-size:clamp(42px,9vw,104px);font-weight:900;letter-spacing:-.055em;line-height:.94;text-shadow:0 0 34px rgba(0,203,255,.18);animation:cineTitleReveal 1.25s cubic-bezier(.2,.8,.2,1) both}
+  .opening-brand span{display:block;margin-top:18px;font-size:clamp(11px,1.8vw,18px);font-weight:500;letter-spacing:.26em;color:#91a8c1}
+  .opening-rule{width:100%;height:1px;margin-top:30px;background:linear-gradient(90deg,#4be6ff,rgba(75,230,255,.12),transparent);transform-origin:left;animation:cineRuleIn 1.2s .3s both}
+  .opening-quote{margin-top:22px;max-width:660px;font-size:clamp(13px,1.8vw,19px);line-height:1.9;color:#d2e5f1;letter-spacing:.04em;animation:cineRiseIn 1s .55s both}
+  .opening-boot{margin-top:auto;padding-top:54px;display:grid;grid-template-columns:1fr auto;gap:10px 24px;align-items:end;color:#809ab3;font-size:11px;letter-spacing:.12em}
+  .opening-phase{color:#e7faff;font-family:'Consolas','Courier New',monospace;font-size:12px;letter-spacing:.1em}
+  .opening-loader{grid-column:1/-1;height:3px;background:rgba(132,192,220,.15);overflow:hidden}
+  .opening-loader span{display:block;width:0;height:100%;background:#45dcff;box-shadow:0 0 18px #45dcff;animation:openingProgress 5.7s cubic-bezier(.16,.6,.25,1) forwards}
+  .opening-small{position:absolute;right:0;bottom:0;font-size:10px;color:#526d84;letter-spacing:.16em}
+  #muyuu-ending-movie{--cine-accent:#4be6ff}
+  .ending-frame{z-index:2;position:relative;width:100%;height:100%;display:grid;grid-template-rows:auto 1fr auto;padding:clamp(17px,3.4vw,44px) clamp(18px,5.3vw,84px);gap:20px}
+  .ending-topbar,.ending-bottombar{display:flex;justify-content:space-between;align-items:center;gap:20px;position:relative;z-index:5;font-family:'Square721BT','Consolas',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8ea8c1}
+  .ending-logomark{font-weight:800;color:#effaff;font-size:13px;letter-spacing:.16em}
+  .ending-counter{color:var(--cine-accent);font-size:11px;white-space:nowrap}
+  .ending-stage{position:relative;min-height:0;display:grid;align-items:end;overflow:hidden;border:1px solid rgba(133,207,241,.16);background:linear-gradient(135deg,rgba(4,12,22,.3),rgba(2,4,10,.8))}
+  .ending-stage::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(2,5,10,.94) 0%,rgba(2,5,10,.69) 44%,rgba(2,5,10,.12) 100%),linear-gradient(0deg,rgba(1,3,8,.85),transparent 60%);pointer-events:none}
+  .ending-stage-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;filter:saturate(.85) contrast(1.08);transform:scale(1.035);transition:opacity .9s ease,transform 5.4s linear}
+  .ending-stage-image.shown{opacity:.64;transform:scale(1.11)}
+  .ending-stage-art{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 78% 34%,color-mix(in srgb,var(--cine-accent) 35%,transparent),transparent 29%),linear-gradient(145deg,rgba(8,23,40,.4),rgba(1,3,9,.85))}
+  .ending-stage-art::before{content:'';position:absolute;right:7%;top:12%;width:min(32vw,390px);aspect-ratio:1;border:1px solid color-mix(in srgb,var(--cine-accent) 65%,transparent);border-radius:50%;box-shadow:0 0 0 22px rgba(150,220,255,.025),0 0 0 52px rgba(150,220,255,.025),inset 0 0 42px color-mix(in srgb,var(--cine-accent) 14%,transparent);animation:cineOrbit 15s linear infinite}
+  .ending-stage-art::after{content:'';position:absolute;right:0;bottom:0;width:70%;height:70%;opacity:.36;background:repeating-linear-gradient(90deg,transparent 0 42px,color-mix(in srgb,var(--cine-accent) 45%,transparent) 43px,transparent 44px),repeating-linear-gradient(0deg,transparent 0 31px,rgba(158,213,255,.12) 32px,transparent 33px);clip-path:polygon(15% 45%,25% 45%,25% 22%,37% 22%,37% 55%,46% 55%,46% 15%,62% 15%,62% 39%,74% 39%,74% 0,89% 0,89% 100%,0 100%,0 65%)}
+  .ending-stage-copy{position:relative;z-index:3;padding:clamp(20px,5vw,70px);max-width:950px;animation:cineRiseIn .7s both}
+  .ending-stage-kicker{color:var(--cine-accent);font-family:'Consolas','Courier New',monospace;font-size:clamp(10px,1.2vw,14px);letter-spacing:.25em;margin-bottom:20px;text-transform:uppercase}
+  .ending-stage-title{font-size:clamp(30px,6.4vw,82px);line-height:.98;letter-spacing:-.045em;font-weight:900;max-width:900px;text-wrap:balance;text-shadow:0 8px 40px rgba(0,0,0,.45)}
+  .ending-stage-desc{margin-top:22px;color:#b7cbdc;font-size:clamp(12px,1.6vw,17px);line-height:1.8;max-width:600px}
+  .ending-timeline{display:flex;gap:5px;align-items:center;min-width:100px;max-width:45vw}
+  .ending-timeline span{display:block;height:3px;flex:1;min-width:5px;background:rgba(150,195,220,.2);transition:background .35s}
+  .ending-timeline span.active{background:var(--cine-accent);box-shadow:0 0 12px color-mix(in srgb,var(--cine-accent) 50%,transparent)}
+  .ending-skip{position:absolute;right:clamp(18px,5.3vw,84px);bottom:clamp(58px,9vh,90px);z-index:6;background:rgba(4,12,22,.82);border:1px solid rgba(155,215,243,.38);color:#c9e6f4;padding:12px 17px;font:700 10px 'Square721BT','Consolas',monospace;letter-spacing:.16em;cursor:pointer}
+  .ending-skip:hover{border-color:var(--cine-accent);color:white}
+  @keyframes cineBgDrift{from{transform:scale(1.01) translateX(-1%)}to{transform:scale(1.08) translateX(1%)}}
+  @keyframes cineGridMove{from{background-position:0 0}to{background-position:0 128px}}
+  @keyframes cineTitleReveal{from{opacity:0;transform:translateY(22px);filter:blur(8px);letter-spacing:.1em}to{opacity:1;transform:translateY(0);filter:blur(0);letter-spacing:-.055em}}
+  @keyframes cineRuleIn{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes cineRiseIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes openingProgress{0%{width:0}35%{width:48%}72%{width:77%}100%{width:100%}}
+  @keyframes cineOrbit{from{transform:rotate(0deg) scale(.96)}to{transform:rotate(360deg) scale(1.04)}}
+  @media(max-width:650px){.opening-layout{width:86vw!important;min-height:76vh!important}.opening-brand{font-size:clamp(39px,12vw,64px);margin-top:8vh}.opening-quote{font-size:13px}.opening-boot{font-size:9px}.ending-frame{padding:16px;gap:12px}.ending-topbar,.ending-bottombar{font-size:8px;letter-spacing:.11em}.ending-stage-copy{padding:22px}.ending-stage-title{font-size:clamp(30px,9vw,54px)}.ending-stage-desc{font-size:12px;max-width:90%}.ending-stage-art::before{width:55vw;right:-4%;top:15%}.ending-stage::before{background:linear-gradient(90deg,rgba(2,5,10,.9),rgba(2,5,10,.5)),linear-gradient(0deg,rgba(1,3,8,.9),transparent 80%)}.ending-skip{bottom:58px;right:16px;padding:10px 12px}.ending-counter{font-size:9px}}
+  @media(prefers-reduced-motion:reduce){.muyuu-cinema *{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+</style>
+
+
+<style id="muyuu-v50-terminal-ending-style">
+  .opening-cinema { background:#020503!important; color:#e2ffe8!important; }
+  .opening-cinema .cine-bg { background:radial-gradient(ellipse at 50% 40%,rgba(22,77,43,.16),transparent 50%),linear-gradient(180deg,#020503,#010201)!important; animation:none!important; }
+  .opening-cinema .cine-grid,.opening-cinema .cine-vignette { display:none!important; }
+  .opening-cinema .cine-scanlines { opacity:.08!important;background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(104,255,143,.15) 4px,transparent 5px)!important; }
+  .opening-terminal-frame { position:relative;z-index:3;width:min(1100px,94vw);height:min(760px,90vh);display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(77,255,133,.38);background:rgba(0,5,2,.97);box-shadow:0 0 0 1px rgba(29,110,54,.15),0 24px 100px rgba(0,0,0,.78),0 0 56px rgba(36,170,72,.08);font-family:'Cascadia Mono','Consolas','Courier New',monospace; }
+  .opening-terminal-titlebar { min-height:38px;padding:0 15px;display:flex;align-items:center;gap:14px;background:linear-gradient(90deg,#102116,#09140d);border-bottom:1px solid rgba(97,255,143,.2);color:#b8d9c0;font-size:11px;letter-spacing:.04em; }
+  .terminal-title-dots { display:flex;gap:5px; }
+  .terminal-title-dots i { display:block;width:7px;height:7px;border-radius:50%;background:#5b9767;opacity:.8; }
+  .terminal-title-dots i:first-child { background:#80e89a; }
+  .terminal-window-state { margin-left:auto;color:#507d5b;font-size:9px;letter-spacing:.12em; }
+  .opening-terminal-content { display:flex;flex:1;min-height:0;flex-direction:column;padding:clamp(16px,3.1vw,38px); }
+  .opening-terminal-header,.opening-terminal-progress-label,.opening-terminal-footer { display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:clamp(9px,.95vw,11px);letter-spacing:.09em;color:#64b87a; }
+  .opening-terminal-header { padding-bottom:13px;border-bottom:1px solid rgba(72,170,96,.2); }
+  .terminal-silent { color:#e4ffab; }
+  .opening-terminal-log { margin-top:18px;flex:1;min-height:0;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;font-size:clamp(11px,1.05vw,14px);line-height:1.75;color:#d4eed9;text-shadow:0 0 9px rgba(58,213,100,.09); }
+  .opening-terminal-log .terminal-command { color:#dcffe5; }
+  .opening-terminal-log .terminal-success { color:#67ef8e; }
+  .opening-terminal-log .terminal-wait { color:#f7df8e; }
+  .opening-terminal-log .terminal-dim { color:#65876b; }
+  .opening-terminal-cursor-row { height:23px;display:flex;align-items:center;gap:5px;font-size:clamp(11px,1.05vw,14px);color:#68ed8b; }
+  .terminal-caret { display:inline-block;width:8px;height:15px;background:#7dff9c;animation:terminalBlink 1s steps(1,end) infinite; }
+  .opening-terminal-progress-label { margin-top:17px;color:#6a9d73; }
+  .opening-terminal-progress { height:3px;margin-top:8px;background:#142419;overflow:hidden; }
+  .opening-terminal-progress span { display:block;width:0;height:100%;background:#52ee81;box-shadow:0 0 14px rgba(82,238,129,.5);transition:width .22s linear; }
+  .opening-terminal-footer { padding:13px 16px;border-top:1px solid rgba(72,170,96,.2);font-size:9px;color:#42654a; }
+  @keyframes terminalBlink { 0%,48%{opacity:1}49%,100%{opacity:0} }
+
+  .ending-frame.is-hidden { display:none!important; }
+  .ending-staffroll[hidden],.ending-audio-start[hidden] { display:none!important; }
+  #ending-movie-skip { z-index:11!important; }
+  .ending-staffroll { position:absolute;inset:0;z-index:8;display:block;overflow:hidden;background:#000;color:#fff;text-align:center;font-family:'Square721BT','LINE Seed JP','Segoe UI',sans-serif; }
+  .ending-staffroll::before,.ending-staffroll::after { content:'';position:absolute;left:0;right:0;height:14vh;z-index:2;pointer-events:none; }
+  .ending-staffroll::before { top:0;background:linear-gradient(#000 8%,transparent); }
+  .ending-staffroll::after { bottom:0;background:linear-gradient(transparent,#000 92%); }
+  .ending-staffroll-track { position:absolute;left:0;right:0;top:0;transform:translateY(100vh);padding:0 20px;box-sizing:border-box;font-size:clamp(14px,1.35vw,19px);line-height:1.7;letter-spacing:.035em;will-change:transform; }
+  @keyframes endingStaffRoll { from{transform:translateY(100vh)} to{transform:translateY(-100%)} }
+  .staffroll-spacer { height:24vh; }
+  .staffroll-title { font-size:clamp(29px,5vw,64px);font-weight:800;letter-spacing:.14em;line-height:1.15; }
+  .staffroll-subtitle { margin-top:14px;margin-bottom:64px;font-size:clamp(13px,1.8vw,21px);letter-spacing:.18em;color:#ddd; }
+  .staffroll-section { margin:0 auto 48px;max-width:900px; }
+  .staffroll-section>div:not(.staffroll-role) { margin:3px 0; }
+  .staffroll-role { margin-bottom:12px;color:#bbb;font:normal clamp(11px,1.05vw,14px) 'Square721BT','Consolas',monospace;letter-spacing:.22em;text-transform:uppercase; }
+  .ending-staffroll a { color:#fff;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.45); }
+  .staffroll-you { margin:0 auto 44px;font-size:clamp(30px,5vw,58px);font-weight:800;letter-spacing:.18em; }
+  .staffroll-thanks { margin:0 auto 20px;font-size:clamp(22px,3.5vw,42px);font-weight:700;letter-spacing:.15em; }
+  .staffroll-end { margin:0 auto;font-size:clamp(16px,2vw,24px);letter-spacing:.2em; }
+  .ending-audio-start { position:absolute;z-index:12;left:50%;bottom:clamp(20px,5vh,50px);transform:translateX(-50%);border:1px solid #fff;background:#050505;color:#fff;padding:12px 18px;font:12px 'Square721BT','Consolas',monospace;letter-spacing:.13em;cursor:pointer; }
+
+  .muyuu-ending-epilogue { position:fixed;inset:0;z-index:1000005;display:none;align-items:center;justify-content:center;overflow:hidden;background:#000;color:#f5f7f8;font-family:'Square721BT','LINE Seed JP','Segoe UI',sans-serif;opacity:0; }
+  .muyuu-ending-epilogue.active { display:flex;opacity:1;animation:epilogueFadeIn .9s ease both; }
+  .epilogue-vignette { position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(17,28,41,.28),transparent 72%);pointer-events:none; }
+  .epilogue-panel,.epilogue-summary { position:relative;z-index:1;width:min(980px,88vw);padding:clamp(20px,4vw,52px);box-sizing:border-box;border:1px solid rgba(211,226,237,.19);background:rgba(0,0,0,.55);box-shadow:0 18px 80px rgba(0,0,0,.6); }
+  .epilogue-topline,.epilogue-bottomline { display:flex;justify-content:space-between;align-items:center;gap:16px;font:10px 'Square721BT','Consolas',monospace;letter-spacing:.16em;color:#8795a1; }
+  .epilogue-rule,.epilogue-summary-rule { height:1px;margin:22px 0;background:linear-gradient(90deg,#fff,rgba(255,255,255,.12),transparent); }
+  .epilogue-speaker { margin:0 0 18px;color:#bdc7d0;font:12px 'Square721BT','Consolas',monospace;letter-spacing:.23em; }
+  .epilogue-story-text { min-height:150px;display:flex;align-items:center;font-size:clamp(17px,2.15vw,25px);line-height:2;letter-spacing:.035em;white-space:pre-wrap;overflow-wrap:anywhere;animation:epilogueLineIn .65s ease both; }
+  .epilogue-story-text.is-reward { color:#fff1a8;text-shadow:0 0 24px rgba(255,241,168,.12); }
+  .epilogue-bottomline { margin-top:32px;letter-spacing:.08em; }
+  .epilogue-bottomline button,.epilogue-summary button { min-height:43px;padding:10px 16px;border:1px solid rgba(255,255,255,.56);background:transparent;color:#fff;font:11px 'Square721BT','Consolas',monospace;letter-spacing:.1em;cursor:pointer; }
+  .epilogue-bottomline button:hover,.epilogue-summary button:hover { background:#fff;color:#000; }
+  .epilogue-summary { width:min(850px,90vw);text-align:left;animation:epilogueLineIn .8s ease both; }
+  .epilogue-summary-kicker { color:#aab4be;font:10px 'Square721BT','Consolas',monospace;letter-spacing:.22em; }
+  .epilogue-summary h1 { margin:22px 0;font:800 clamp(34px,6vw,66px) 'Square721BT','Consolas',monospace;letter-spacing:.025em; }
+  .epilogue-summary p { font-size:clamp(14px,1.5vw,17px);line-height:1.95;color:#d1d7dc;margin:12px 0; }
+  .epilogue-summary .epilogue-reward { color:#fff1a8;font-weight:700; }
+  .epilogue-anomaly { display:flex;flex-direction:column;gap:7px;margin:24px 0;padding:17px 0;border-top:1px solid rgba(255,255,255,.2);border-bottom:1px solid rgba(255,255,255,.2);color:#fff;line-height:1.8; }
+  .epilogue-anomaly strong { font:700 12px 'Square721BT','Consolas',monospace;letter-spacing:.18em;color:#fff1a8; }
+  .epilogue-summary button { margin-top:8px;min-width:min(300px,100%); }
+  .epilogue-panel.epilogue-leaving { animation:epilogueFadeOut .9s ease forwards; }
+  .epilogue-summary.epilogue-arriving { animation:epilogueLineIn .8s ease both; }
+  @keyframes epilogueFadeIn { from{opacity:0} to{opacity:1} }
+  @keyframes epilogueFadeOut { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-8px);filter:blur(3px)} }
+  @keyframes epilogueLineIn { from{opacity:0;transform:translateY(13px);filter:blur(2px)} to{opacity:1;transform:translateY(0);filter:blur(0)} }
+  @media(max-width:650px) {
+    .opening-terminal-frame { width:96vw;height:92vh; }
+    .opening-terminal-titlebar { gap:8px;padding:0 9px;font-size:9px; }
+    .terminal-window-state { display:none; }
+    .opening-terminal-content { padding:15px 12px; }
+    .opening-terminal-log { font-size:11px;line-height:1.75; }
+    .opening-terminal-footer { font-size:8px;padding:11px 8px; }
+    .ending-staffroll-track { padding:0 16px;font-size:14px; }
+    .staffroll-section { margin-bottom:42px; }
+    .epilogue-panel { width:94vw;padding:18px; }
+    .epilogue-topline,.epilogue-bottomline { font-size:8px;letter-spacing:.06em; }
+    .epilogue-story-text { min-height:190px;font-size:16px;line-height:1.85; }
+    .epilogue-summary { width:94vw;padding:19px; }
+    .epilogue-summary h1 { font-size:34px; }
+    .epilogue-summary p { font-size:13px; }
+  }
+  @media(prefers-reduced-motion:reduce) { .opening-terminal-content *,.ending-staffroll-track,.epilogue-panel,.epilogue-summary { animation-duration:.01ms!important; } }
+</style>
+
 </head>
 <body>
+
+<!-- Silent terminal-style startup sequence. No audio is created or played here. -->
+<div id="muyuu-opening-movie" class="muyuu-cinema opening-cinema" role="status" aria-live="polite" aria-label="MUYUU silent terminal startup">
+  <div class="opening-terminal-frame">
+    <div class="opening-terminal-titlebar">
+      <div class="terminal-title-dots"><i></i><i></i><i></i></div>
+      <span>C:\MUYUU\CLIENT\boot.exe — Command Prompt</span>
+      <span class="terminal-window-state">ADMINISTRATOR · LOCAL SESSION</span>
+    </div>
+    <div class="opening-terminal-content">
+      <div class="opening-terminal-header">
+        <span>PROJECT MUYUU / CLIENT BOOT</span>
+        <span class="terminal-silent">AUDIO: DISABLED</span>
+      </div>
+      <div id="opening-terminal-log" class="opening-terminal-log" aria-live="off"></div>
+      <div class="opening-terminal-cursor-row"><span>C:\MUYUU\CLIENT&gt;</span><i class="terminal-caret"></i></div>
+      <div class="opening-terminal-progress-label"><span id="opening-terminal-status">BOOT SEQUENCE QUEUED</span><span id="opening-terminal-percent">0%</span></div>
+      <div class="opening-terminal-progress"><span id="opening-terminal-progress-fill"></span></div>
+    </div>
+    <div class="opening-terminal-footer"><span>LINE SEED JP / SQUARE 721 / CASCADIA MONO</span><span>NO BGM · NO SFX · SILENT BOOT</span></div>
+  </div>
+</div>
+<!-- Ending film: all levels from 1-1 through 16-F, then a classic black-and-white staff roll. -->
+<div id="muyuu-ending-movie" class="muyuu-cinema is-concealed" aria-hidden="true" role="dialog" aria-modal="true" aria-label="MUYUU ending movie">
+  <div class="cine-bg"></div><div class="cine-grid"></div><div class="cine-scanlines"></div><div class="cine-vignette"></div>
+  <div class="ending-frame" id="ending-movie-main-frame">
+    <div class="ending-topbar"><span class="ending-logomark">PROJECT MUYUU <span style="color:#64839b">/ ARCHIVE FILM</span></span><span id="ending-movie-counter" class="ending-counter">RECORD 01 / 07</span></div>
+    <div id="ending-movie-stage" class="ending-stage">
+      <div class="ending-stage-art"></div>
+      <img id="ending-movie-image" class="ending-stage-image" alt="A captured scene from a previously visited stage" />
+      <div class="ending-stage-copy">
+        <div id="ending-movie-kicker" class="ending-stage-kicker">STAGE ARCHIVE / 00</div>
+        <h1 id="ending-movie-title" class="ending-stage-title">THE FIRST SIGNAL</h1>
+        <p id="ending-movie-description" class="ending-stage-desc">Every sector leaves a trace.</p>
+      </div>
+    </div>
+    <div class="ending-bottombar"><span id="ending-movie-footnote">FIELD RECORD · NO.00</span><div id="ending-movie-timeline" class="ending-timeline" aria-hidden="true"></div><span>THANK YOU FOR PLAYING</span></div>
+  </div>
+  <div id="ending-movie-staffroll" class="ending-staffroll" hidden aria-hidden="true">
+    <div class="ending-staffroll-track" id="ending-movie-staffroll-track">
+      <div class="staffroll-spacer"></div>
+      <div class="staffroll-title">PROJECT MUYUU</div>
+      <div class="staffroll-subtitle">Metalepsis_ 2D ACTION GAME</div>
+      <div class="staffroll-section"><div class="staffroll-role">AUTHOR</div><div>Metalepsis_ <a href="https://twitter.com/Metalepsis_jp" target="_blank" rel="noopener noreferrer">(@Metalepsis_jp)</a></div></div>
+      <div class="staffroll-section"><div class="staffroll-role">STORY EDITER</div><div>Metalepsis_ <a href="https://twitter.com/Metalepsis_jp" target="_blank" rel="noopener noreferrer">(@Metalepsis_jp)</a></div></div>
+      <div class="staffroll-section"><div class="staffroll-role">PRODUCTION SUPPORT</div><div>Claude</div><div>ChatGPT</div><div>Gemini</div></div>
+      <div class="staffroll-section"><div class="staffroll-role">ORIGINAL CONCEPT BY</div><div>Metalepsis_ <a href="https://twitter.com/Metalepsis_jp" target="_blank" rel="noopener noreferrer">(@Metalepsis_jp)</a></div><div>ぴの👻🦋 <a href="https://twitter.com/pino3296" target="_blank" rel="noopener noreferrer">(@pino3296)</a></div></div>
+      <div class="staffroll-section"><div class="staffroll-role">BGM</div><div>Metalepsis_(SUNO AI) - MENU</div><div>Metalepsis_(SUNO AI) - PillaR</div><div>Creo - Restless</div><div>まんぼう二等兵(Opentracks) - プラネタリウムガーデン</div><div>Nitro Fun - FINAL BOSS</div><div>CrimzonWolf777 - Fear Factory 2009</div></div>
+      <div class="staffroll-section" id="ending-bgm-stage17-lock"><div class="staffroll-role">BGM ARCHIVE / LOCKED</div><div>STAGE 17 CLEAR REQUIRED</div><div>Additional soundtrack records remain sealed.</div></div>
+      <div class="staffroll-section" id="ending-bgm-stage17-tracks" hidden><div class="staffroll-role">BGM / STAGE 17 ARCHIVE</div><div>FREE99 - OXYGEN</div><div>nons works - 絶望から見い出した希望</div><div>rl1805 - blue feat. rollin9girl</div><div>Dunderpatrullen - Singlarity</div></div>
+      <div class="staffroll-section"><div class="staffroll-role">ENDING MUSIC</div><div>全て日和の所為です。 - arcadia</div></div>
+      <div class="staffroll-section"><div class="staffroll-role">SPECIAL THANKS</div>
+        <div>桜宮 凪 <a href="https://twitter.com/sakumiya3938" target="_blank" rel="noopener noreferrer">(@sakumiya3938)</a></div>
+        <div>TR𝙰𝙸TOR? (배신자)@就活中？ <a href="https://twitter.com/Traitor_BEMANI" target="_blank" rel="noopener noreferrer">(@Traitor_BEMANI)</a></div>
+        <div>猫谷みぃた(強いマン,始末マン) <a href="https://twitter.com/nekoya_mita" target="_blank" rel="noopener noreferrer">(@nekoya_mita)</a></div>
+        <div>蜜柑せ🍊 <a href="https://twitter.com/orange_kotama_" target="_blank" rel="noopener noreferrer">(@orange_kotama_)</a></div>
+        <div>zero <a href="https://twitter.com/zero381190" target="_blank" rel="noopener noreferrer">(@zero381190)</a></div>
+        <div>霧時雨 <a href="https://twitter.com/mist_rein96c" target="_blank" rel="noopener noreferrer">(@mist_rein96c)</a></div>
+        <div>レティ・エル＝パスカルナノ嬢 <a href="https://twitter.com/LettieWhiterock" target="_blank" rel="noopener noreferrer">(@LettieWhiterock)</a></div>
+        <div>Sato <a href="https://twitter.com/sato27535" target="_blank" rel="noopener noreferrer">(@sato27535)</a></div>
+        <div>神夜聖一郎(yunesss&Respect) <a href="https://twitter.com/yunesss_Respect" target="_blank" rel="noopener noreferrer">(@yunesss_Respect)</a></div>
+        <div>おこじょきんぐ <a href="https://twitter.com/0kojme1me" target="_blank" rel="noopener noreferrer">(@0kojme1me)</a></div>
+        <div>icey <a href="https://twitter.com/icey_1220" target="_blank" rel="noopener noreferrer">(@icey_1220)</a></div>
+        <div>PC Vre16.6 <a href="https://twitter.com/PC_Ver16_6" target="_blank" rel="noopener noreferrer">(@PC_Ver16_6)</a></div>
+        <div>えびカツどん <a href="https://twitter.com/GWYX7zo1wA77415" target="_blank" rel="noopener noreferrer">(@GWYX7zo1wA77415)</a></div>
+        <div>yukkri namake <a href="https://twitter.com/yukkrinamake" target="_blank" rel="noopener noreferrer">(@yukkrinamake)</a></div>
+        <div>ざうるす/NC専 <a href="https://twitter.com/fooooooob1234" target="_blank" rel="noopener noreferrer">(@fooooooob1234)</a></div>
+        <div>MMRB指揮官 <a href="https://twitter.com/MMRBSKKN" target="_blank" rel="noopener noreferrer">(@MMRBSKKN)</a></div>
+        <div>マーシュ <a href="https://twitter.com/marsh_some" target="_blank" rel="noopener noreferrer">(@marsh_some)</a></div>
+        <div>saki. <a href="https://twitter.com/saki28509" target="_blank" rel="noopener noreferrer">(@saki28509)</a></div>
+        <div>Hokori _VRC <a href="https://twitter.com/hokorinokotyann" target="_blank" rel="noopener noreferrer">(@hokorinokotyann)</a></div>
+        <div>Crayfish <a href="https://twitter.com/lXqGCaUfgH73677" target="_blank" rel="noopener noreferrer">(@lXqGCaUfgH73677)</a></div>
+        <div>るぁずべりー（ﾋﾟ稲） <a href="https://twitter.com/3txw5w" target="_blank" rel="noopener noreferrer">(@3txw5w)</a></div>
+        <div>名無しちゃん‎🤍🩹‎💙 <a href="https://twitter.com/qsvoicntnzkgs9" target="_blank" rel="noopener noreferrer">(@qsvoicntnzkgs9)</a></div>
+        <div>み <a href="https://twitter.com/yoridorimidoriP" target="_blank" rel="noopener noreferrer">(@yoridorimidoriP)</a></div>
+        <div>迷える子羊（非公式） <a href="https://twitter.com/kyusai_nehan" target="_blank" rel="noopener noreferrer">(@kyusai_nehan)</a></div>
+        <div>定時退社ごーなうす <a href="https://twitter.com/Goooooonausu" target="_blank" rel="noopener noreferrer">(@Goooooonausu)</a></div>
+        <div>毬藻煮込み <a href="https://twitter.com/FlyingNeguse" target="_blank" rel="noopener noreferrer">(@FlyingNeguse)</a></div>
+        <div>しらす <a href="https://twitter.com/shirasu_dankagu" target="_blank" rel="noopener noreferrer">(@shirasu_dankagu)</a></div>
+        <div>MiZ <a href="https://twitter.com/01satousaikou" target="_blank" rel="noopener noreferrer">(@01satousaikou)</a></div>
+        <div>ゆっさー🍭🍁 <a href="https://twitter.com/spl_yskun25" target="_blank" rel="noopener noreferrer">(@spl_yskun25)</a></div>
+        <div>ドラゴンくん <a href="https://twitter.com/Doragonkun1031" target="_blank" rel="noopener noreferrer">(@Doragonkun1031)</a></div>
+        <div>🍒 <a href="https://twitter.com/8wfsyt" target="_blank" rel="noopener noreferrer">(@8wfsyt)</a></div>
+        <div>メンダ5 <a href="https://twitter.com/8lpdkbw9wyIfRZH" target="_blank" rel="noopener noreferrer">(@8lpdkbw9wyIfRZH)</a></div>
+        <div>Gboard クリップボードへようこそ。コピーしたテキストはここに保存されます。クリップを <a href="https://twitter.com/startarstart" target="_blank" rel="noopener noreferrer">(@startarstart)</a></div>
+      </div>
+      <div class="staffroll-section"><div class="staffroll-role">WITH GRATITUDE</div><div>All Metalepsis_ Follower</div><div>All Mtps Diagnosis Player</div><div>All Mtps Ω Field Player</div><div>All Mtps MUYUU Player</div></div>
+      <div class="staffroll-you">AND YOU.</div>
+      <div class="staffroll-thanks">THANK YOU FOR PLAYING</div>
+      <div class="staffroll-end">PROJECT MUYUU END.</div>
+      <div class="staffroll-section"><div class="staffroll-role">MESSAGE FROM THE CREATOR</div><div>MUYUUをプレイしていただきありがとうございます。</div><div>どうでしたか？楽しめたでしょうか。</div><div>楽しんでいただけたら幸いです。</div><div>今後もアップデートし続けますので、気が向いたらぜひ遊びに来てくださいね。</div><div>それでは、またお会いしましょう…</div></div>
+<div class="staffroll-spacer"></div>
+    </div>
+  </div>
+  <button id="ending-movie-skip" class="ending-skip" type="button">SKIP FILM / CONTINUE</button>
+  <button id="ending-movie-audio-start" class="ending-audio-start" type="button" hidden>START ENDING AUDIO</button>
+</div>
+
+<div id="muyuu-ending-epilogue" class="muyuu-ending-epilogue" aria-hidden="true">
+  <div class="epilogue-vignette"></div>
+  <div id="ending-epilogue-story" class="epilogue-panel" aria-live="polite">
+    <div class="epilogue-topline"><span>PROJECT MUYUU / ARSENAL ENDING</span><span id="ending-epilogue-counter">RECORD 01 / 07</span></div>
+    <div class="epilogue-rule"></div>
+    <div id="ending-epilogue-speaker" class="epilogue-speaker">ARCHIVE NARRATION</div>
+    <div id="ending-epilogue-text" class="epilogue-story-text"></div>
+    <div class="epilogue-bottomline"><span id="ending-epilogue-hint">AUTO ADVANCE / ENTER TO CONTINUE</span><button id="ending-epilogue-next" type="button">NEXT RECORD →</button></div>
+  </div>
+  <div id="ending-epilogue-summary" class="epilogue-summary" hidden>
+    <div class="epilogue-summary-kicker">PROJECT MUYUU / FINAL ARCHIVE</div>
+    <h1>MAIN STORY CLEAR</h1>
+    <div class="epilogue-summary-rule"></div>
+    <p class="epilogue-reward">クリア報酬：アーセナルユニットを獲得しました。</p>
+    <p>ここから先は、カードを強化したり、クエストをこなしたり自由にプレイしてみてください。</p>
+    <p>このエンディングは16-Fをクリアすれば毎回見ることができます。</p>
+    <div class="epilogue-anomaly"><strong>おや？</strong><span>どうやら、1-1に異変が発生しているようです…</span></div>
+    <button id="ending-epilogue-continue" type="button">CREATE CLEAR RESULT →</button>
+  </div>
+</div>
 
 <div id="game-wrapper">
     <canvas id="gameCanvas"></canvas>
@@ -1236,15 +1502,33 @@ body.menu-overlay-open #hud-top-left, body.menu-overlay-open #status-monitor { t
     <!-- 操作ガイド: 必要なときだけ開く -->
     <div id="ui-layer">
         <div class="controls-head"><span>FIELD MANUAL / 操作方法</span><button id="controls-close" type="button">閉じる ×</button></div>
-        <div><span class="key">A</span><span class="key">D</span> / <span class="key">←</span><span class="key">→</span> 移動 &nbsp;|&nbsp; <span class="key">W</span> / <span class="key">↑</span> ジャンプ &nbsp;|&nbsp; <span class="key">S</span>+<span class="key">W</span> 足場を降りる</div>
-        <div><span class="key">Z</span> 攻撃 (近接: 3連目は<span class="highlight">回転斬り</span> / 銃: 武器ごとの連射・装弾)</div>
-        <div>大剣 空中<span class="key">Z</span> <span class="highlight">空中斬り→空中回転斬り</span> &nbsp;|&nbsp; 空中<span class="key">S</span>+<span class="key">Z</span> <span class="highlight">落下突き</span> &nbsp;|&nbsp; ブースト中<span class="key">Z</span> <span class="highlight">突進攻撃</span></div>
-        <div><span class="key">Tab</span> 武器選択(59種・購入兵装含む) &nbsp;|&nbsp; <span class="key">I</span> インベントリ &nbsp;|&nbsp; <span class="key">X</span>/<span class="key">C</span> 武器切替 &nbsp;|&nbsp; <span class="key">Q</span>/<span class="key">E</span> 前後の武器</div>
-        <div><span class="key">方向キー×2</span> クイックブースト(短時間高速機動) &nbsp;|&nbsp; <span class="key">Shift</span>+方向 ブースト &nbsp;|&nbsp; 移動キーを270ms以内に2回押すとクイックブースト &nbsp;|&nbsp; <span class="key">R</span> リロード &nbsp;|&nbsp; <span class="key">T</span> 初期化 &nbsp;|&nbsp; <span class="key">H</span> 操作 &nbsp;|&nbsp; <span class="key">K</span> カード &nbsp;|&nbsp; <span class="key">V</span> アタッチメント &nbsp;|&nbsp; <span class="key">J</span> クエスト &nbsp;|&nbsp; <span class="key">F</span> NPC会話 &nbsp;|&nbsp; <span class="key">Esc</span> ポーズ。端まで進むと次マップへ遷移。縦型マップは足場を登って上層出口へ。最後のマップでボス出現。</div>
+        <div class="manual-pc">
+            <div><span class="key">A</span><span class="key">D</span> / <span class="key">←</span><span class="key">→</span> 移動 &nbsp;|&nbsp; <span class="key">W</span> / <span class="key">↑</span> ジャンプ &nbsp;|&nbsp; <span class="key">S</span>+<span class="key">W</span> 足場を降りる</div>
+            <div><span class="key">Z</span> 攻撃 (近接: 3連目は<span class="highlight">回転斬り</span> / 銃: 武器ごとの連射・装弾)</div>
+            <div>大剣 空中<span class="key">Z</span> <span class="highlight">空中斬り→空中回転斬り</span> &nbsp;|&nbsp; 空中<span class="key">S</span>+<span class="key">Z</span> <span class="highlight">落下突き</span> &nbsp;|&nbsp; ブースト中<span class="key">Z</span> <span class="highlight">突進攻撃</span></div>
+            <div><span class="key">Tab</span> 武器選択(59種・購入兵装含む) &nbsp;|&nbsp; <span class="key">I</span> インベントリ &nbsp;|&nbsp; <span class="key">X</span>/<span class="key">C</span> 武器切替 &nbsp;|&nbsp; <span class="key">Q</span>/<span class="key">E</span> 前後の武器</div>
+            <div><span class="key">方向キー×2</span> クイックブースト(短時間高速機動) &nbsp;|&nbsp; <span class="key">Shift</span>+方向 ブースト &nbsp;|&nbsp; 移動キーを270ms以内に2回押すとクイックブースト &nbsp;|&nbsp; <span class="key">R</span> リロード &nbsp;|&nbsp; <span class="key">T</span> 初期化 &nbsp;|&nbsp; <span class="key">H</span> 操作 &nbsp;|&nbsp; <span class="key">K</span> カード &nbsp;|&nbsp; <span class="key">V</span> アタッチメント &nbsp;|&nbsp; <span class="key">J</span> クエスト &nbsp;|&nbsp; <span class="key">F</span> NPC会話 &nbsp;|&nbsp; <span class="key">Esc</span> ポーズ。端まで進むと次マップへ遷移。縦型マップは足場を登って上層出口へ。最後のマップでボス出現。</div>
+        </div>
+        <div class="manual-mobile">
+            <div><span class="key">MOVE</span> 左側のスライドスティックで移動。スティックを上へ倒す／右側の<span class="key">JUMP</span>でジャンプ、下へ倒すと足場を降りる</div>
+            <div><span class="key">BOOST</span>を押しながらスティックを倒すとブースト移動。スティックを素早く左右へ倒すとクイックブースト</div>
+            <div><span class="key">ATTACK</span> 攻撃（近接3連目は<span class="highlight">回転斬り</span>）。大剣の空中斬り・落下突き・突進攻撃も使用可能</div>
+            <div><span class="key">CHANGE</span> 次の武器へ切り替え &nbsp;|&nbsp; <span class="key">RELOAD</span> リロード &nbsp;|&nbsp; <span class="key">THROW</span> 表示中はロンギヌスの槍を投擲</div>
+            <div><span class="key">INTERACT</span> NPCに話しかける／調べる（会話中もタップで次へ） &nbsp;|&nbsp; <span class="key">CARD</span> カード編成 &nbsp;|&nbsp; <span class="key">BAG</span> 武器庫</div>
+            <div><span class="key">Ⅱ PAUSE</span> ポーズメニュー。クエストやアタッチメントなどのメニューはポーズ画面から開く。端まで進むと次マップへ遷移。縦型マップは足場を登って上層出口へ。</div>
+        </div>
     </div>
     <button id="controls-toggle" type="button" aria-expanded="false">操作ガイド <span class="key">H</span></button>
 </div>
 
+<style>
+/* v52: device-specific instructions in field manual */
+.manual-mobile{display:none}
+html[data-control-mode="mobile"] .manual-pc{display:none!important}
+html[data-control-mode="mobile"] .manual-mobile{display:block}
+.manual-mobile>div{margin:5px 0}
+.manual-mobile .key{display:inline-block;margin-right:3px}
+</style>
 <!-- タイトル画面 -->
 <div id="start-screen" class="screen-overlay">
     <div class="screen-panel">
@@ -1264,6 +1548,7 @@ body.menu-overlay-open #hud-top-left, body.menu-overlay-open #status-monitor { t
             <button class="screen-button" id="start-attachments-btn" type="button">WEAPON MODS / アタッチメント<small>武器の追加効果を変更 · V</small></button>
             <button class="screen-button" id="start-quests-btn" type="button">QUEST LOG / クエスト<small>依頼・報酬・クラフト経験値 · J</small></button>
             <button class="screen-button" id="start-options-btn" type="button">OPTIONS / 設定<small>描画品質・BGM・効果音 · O</small></button>
+            <button class="screen-button" id="start-credits-btn" type="button">CREDITS / クレジット<small>制作・コンセプト・BGM・Special Thanks</small></button>
             <button class="screen-button primary" id="title-save-btn" type="button">SAVE GAME / セーブ<small>進行状況・装備・位置を保存 · Ctrl+S</small></button>
             <button class="screen-button danger" id="title-reset-data-btn" type="button">RESET DATA / データリセット<small>保存データをすべて初期化</small></button>
         </div>
@@ -1303,6 +1588,7 @@ body.menu-overlay-open #hud-top-left, body.menu-overlay-open #status-monitor { t
             <button class="screen-button" id="pause-attachments-btn" type="button">WEAPON MODS / アタッチメント<small>武器の追加効果を変更 · V</small></button>
             <button class="screen-button" id="pause-quests-btn" type="button">QUEST LOG / クエスト<small>依頼・報酬・クラフト経験値 · J</small></button>
             <button class="screen-button" id="pause-options-btn" type="button">OPTIONS / 設定<small>描画品質・BGM・効果音 · O</small></button>
+            <button class="screen-button" id="pause-credits-btn" type="button">CREDITS / クレジット<small>スタッフ・楽曲・Special Thanks</small></button>
             <button class="screen-button primary" id="pause-save-btn" type="button">SAVE GAME / セーブ<small>進行状況・装備・位置を保存 · Ctrl+S</small></button>
             <button class="screen-button danger" id="pause-reset-data-btn" type="button">RESET DATA / データリセット<small>保存データをすべて初期化</small></button>
         </div>
@@ -1602,7 +1888,18 @@ const movementTapAt = {left:0, right:0, up:0, down:0};
 const DOUBLE_TAP_WINDOW_MS = 270;
 
 window.addEventListener('keydown', (e) => {
+    if (typeof openingMovieActive !== 'undefined' && openingMovieActive) { e.preventDefault(); e.stopImmediatePropagation(); return; }
+    if (typeof endingMovieActive !== 'undefined' && endingMovieActive) return; // The film's own capture listener handles skip input.
     const code = e.code;
+    // v47: when a text field is focused, do not pass letter keys to gameplay shortcuts.
+    // Preserve Escape handling so overlays can still close through their own capture listeners.
+    const target = e.target;
+    const typingIntoField = !!(target && (
+        (typeof target.matches === 'function' && target.matches('input, textarea, select')) ||
+        target.isContentEditable ||
+        (typeof target.closest === 'function' && target.closest('[contenteditable="true"], [role="textbox"]'))
+    ));
+    if (typingIntoField && code !== 'Escape') return;
     if (code === 'Tab') {
         e.preventDefault();
         if (!e.repeat) { if (menuOpen) closeMenu(); else openMenu(false); }
@@ -2323,6 +2620,7 @@ addMelee('gravity_hammer', 'GRAVITY HAMMER', 'グラビティハンマー', { dm
 addMelee('storm_pike', 'STORM PIKE', 'ストームパイク', { dmg:1.12, reach:1.72, speed:1.06, kb:1.4, col:'#67e8f9', shopOnly:true, cost:4450, desc:'長い間合いから雷をまとった突きを繰り出す。', sh:{k:'spear',len:82,w0:3,w1:10,cl:'#67e8f9'} });
 addMelee('phase_katana', 'PHASE KATANA', 'フェイズカタナ', { dmg:1.26, reach:1.12, speed:1.62, kb:.8, col:'#c4b5fd', shopOnly:true, cost:5400, desc:'位相ずれを利用する高速刀。連撃に向く。', sh:{k:'beam',len:74,bc:'#c4b5fd'} });
 addMelee('chain_blade', 'CHAIN BLADE', 'チェーンブレード', { dmg:1.42, reach:1.0, speed:.98, kb:1.05, col:'#fb923c', shopOnly:true, cost:4900, desc:'鎖刃で斬りつける。重い連続攻撃が得意。', sh:{k:'saw',len:64} });
+addMelee('longinus_spear', 'LANCE OF LONGINUS', 'ロンギヌスの槍', { dmg:999999, reach:5.5, speed:1.4, kb:12, col:'#ff243f', shopOnly:true, cost:0, unlockCondition:'promo_code', specialLonginus:true, desc:'巨大な赤いダブルヘリックス軸と二股の槍頭を持つ秘匿兵装。Zキーで振り、Cキーで投擲。投擲は命中した敵1体にのみ有効。ボスには無効。', sh:{k:'spear',len:190,w0:10,w1:24,cl:'#ff243f'} });
 addMelee('arsenal_unit', 'ARSENAL UNIT', 'アーセナルユニット', { dmg:2.2, reach:1.62, speed:1.65, kb:1.75, col:'#f8fafc', shopOnly:true, cost:0, unlockCondition:'ending_clear', arsenalUnit:true, desc:'白い双翼ジェットユニットと双剣を搭載。飛行時間2倍・飛行速度1.8倍。ジェットエネルギーを10基の実体刃ソードビットへ変換し、高速射出する。エンディング後に自動解放。', sh:{k:'arsenal',len:64,bc:'#f8fafc'} });
 
 // Stage-clear reward weapons
@@ -2354,6 +2652,7 @@ function isWeaponOwned(id){return weaponPurchaseState.owned.includes(id);}
 function purchaseWeaponWithCoins(id){
     const w=WEAPON_BY_ID[id];
     if(!w||!w.shopOnly){return false;}
+    if(w.unlockCondition==='promo_code'&&!isWeaponOwned(id)){showGameToast('SPECIAL LICENSE REQUIRED / 解放条件を確認してください');return false;}
     if(['stage4_clear','stage8_clear','stage12_clear','stage14_clear'].includes(w.unlockCondition)&&!isWeaponOwned(id)){showGameToast('LOCKED / ステージクリア報酬武器です');return false;}
     if(w.unlockCondition==='final_clear'&&!isWeaponOwned(id)){showGameToast('LOCKED / 最終ステージをクリアしてください');return false;}
     if(w.unlockCondition==='ending_clear'&&!isWeaponOwned(id)){showGameToast('LOCKED / エンディング到達後に解放');return false;}
@@ -2863,13 +3162,64 @@ function drawArsenalUnitWeaponShape() {
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.strokeStyle = 'rgba(224,242,254,.72)'; ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.moveTo(5,-17); ctx.lineTo(49,-11); ctx.moveTo(5,17); ctx.lineTo(49,11); ctx.stroke(); ctx.restore();
 }
+function drawLonginusSpearGlyph(length=190) {
+    // 巨大な赤い二重螺旋の軸と、先端が二股に分かれたフォーク状の槍頭。
+    const shaftEnd=length-27, half=8.5;
+    ctx.save(); ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.shadowColor='#ff123b'; ctx.shadowBlur=18;
+    const core=ctx.createLinearGradient(0,-half-3,0,half+3);
+    core.addColorStop(0,'#ff9aa7'); core.addColorStop(.16,'#d90b2e'); core.addColorStop(.5,'#5b0718'); core.addColorStop(.82,'#e20d32'); core.addColorStop(1,'#580514');
+    ctx.fillStyle=core; ctx.strokeStyle='#ff586c'; ctx.lineWidth=1.25;
+    ctx.beginPath(); ctx.moveTo(-17,-5); ctx.lineTo(shaftEnd,-5); ctx.lineTo(shaftEnd+7,-2); ctx.lineTo(shaftEnd+7,2); ctx.lineTo(shaftEnd,5); ctx.lineTo(-17,5); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // 背骨の暗い溝で芯の太さを強調。
+    ctx.shadowBlur=0; ctx.strokeStyle='#30030c'; ctx.lineWidth=3.5; ctx.beginPath(); ctx.moveTo(-12,0); ctx.lineTo(shaftEnd+2,0); ctx.stroke();
+    const turns=5, steps=100;
+    for(let strand=0;strand<2;strand++){
+      ctx.beginPath();
+      for(let i=0;i<=steps;i++){
+        const t=i/steps, x=-9+t*(shaftEnd+3), ph=t*Math.PI*2*turns+strand*Math.PI;
+        const y=Math.sin(ph)*7.15;
+        if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=strand===0?'#ff183a':'#b00027'; ctx.lineWidth=6.2; ctx.shadowColor=strand===0?'#ff2747':'#b80025'; ctx.shadowBlur=10; ctx.stroke();
+      // 各ストランドの細い反射線。
+      ctx.beginPath();
+      for(let i=0;i<=steps;i++){
+        const t=i/steps, x=-9+t*(shaftEnd+3), ph=t*Math.PI*2*turns+strand*Math.PI;
+        const y=Math.sin(ph)*7.15-1.05;
+        if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=strand===0?'rgba(255,205,211,.92)':'rgba(255,76,98,.8)'; ctx.lineWidth=1.35; ctx.shadowBlur=2; ctx.stroke();
+    }
+    // ヘリックスを束ねる小さな赤い固定リング。
+    ctx.shadowBlur=0;
+    for(let i=0;i<4;i++){
+      const x=13+i*(shaftEnd-16)/4;
+      ctx.strokeStyle=i%2?'#ff6578':'#780019'; ctx.lineWidth=2.2; ctx.beginPath(); ctx.ellipse(x,0,2.6,9.4,0,0,Math.PI*2); ctx.stroke();
+    }
+    // 分岐部のカラーと上下2本の鋭いフォーク。
+    const collar=ctx.createLinearGradient(0,-13,0,13); collar.addColorStop(0,'#ffd4da');collar.addColorStop(.22,'#ff183a');collar.addColorStop(.5,'#620817');collar.addColorStop(.78,'#ed1235');collar.addColorStop(1,'#45030c');
+    ctx.fillStyle=collar; ctx.strokeStyle='#ff8c9c'; ctx.lineWidth=1.25;
+    ctx.beginPath(); ctx.moveTo(shaftEnd-7,-8);ctx.lineTo(shaftEnd+5,-12);ctx.lineTo(shaftEnd+13,-8);ctx.lineTo(shaftEnd+13,8);ctx.lineTo(shaftEnd+5,12);ctx.lineTo(shaftEnd-7,8);ctx.closePath();ctx.fill();ctx.stroke();
+    const tine=ctx.createLinearGradient(0,-20,0,20); tine.addColorStop(0,'#ffb0bb');tine.addColorStop(.18,'#ff213f');tine.addColorStop(.48,'#8c001c');tine.addColorStop(.78,'#ec1234');tine.addColorStop(1,'#4b0611');
+    ctx.fillStyle=tine;ctx.strokeStyle='#ff7184';ctx.lineWidth=1.45;ctx.shadowColor='#ff123b';ctx.shadowBlur=14;
+    // 上側の尖った爪
+    ctx.beginPath();ctx.moveTo(shaftEnd+4,-5);ctx.lineTo(length-5,-18);ctx.lineTo(length+20,-17);ctx.lineTo(length+7,-10);ctx.lineTo(shaftEnd+16,-2);ctx.closePath();ctx.fill();ctx.stroke();
+    // 下側の尖った爪
+    ctx.beginPath();ctx.moveTo(shaftEnd+4,5);ctx.lineTo(shaftEnd+16,2);ctx.lineTo(length+7,10);ctx.lineTo(length+20,17);ctx.lineTo(length-5,18);ctx.closePath();ctx.fill();ctx.stroke();
+    // フォークの内側に暗い切れ込みを作り、二股であることを遠目でも分かるようにする。
+    ctx.shadowBlur=0;ctx.strokeStyle='#42000d';ctx.lineWidth=3.2;ctx.beginPath();ctx.moveTo(shaftEnd+10,0);ctx.lineTo(length+4,0);ctx.stroke();
+    ctx.strokeStyle='rgba(255,233,237,.9)';ctx.lineWidth=1.25;ctx.beginPath();ctx.moveTo(shaftEnd+15,-7);ctx.lineTo(length+14,-16);ctx.moveTo(shaftEnd+15,7);ctx.lineTo(length+14,16);ctx.stroke();
+    ctx.restore();
+}
 function drawActiveWeapon(x, y, angle, facing, def) {
     if (typeof def === 'string') def = def === 'sword' ? WEAPON_BY_ID.greatsword : WEAPON_BY_ID.ar;
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(facing, 1);
     ctx.rotate(angle);
-    if(def.id==='beam_magnum'){
+    if(def.id==='longinus_spear') drawLonginusSpearGlyph((def.sh&&def.sh.len)||190);
+    else if(def.id==='beam_magnum'){
       // 大型拳銃形状：角張った装甲スライド、交換式Eパック、三重銃口。
       ctx.fillStyle='#170f21';ctx.strokeStyle='#ffb4e6';ctx.lineWidth=1.8;ctx.beginPath();ctx.moveTo(-14,-9);ctx.lineTo(18,-10);ctx.lineTo(29,-7);ctx.lineTo(39,-4);ctx.lineTo(39,4);ctx.lineTo(29,7);ctx.lineTo(18,10);ctx.lineTo(-10,8);ctx.lineTo(-14,3);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.fillStyle='#422449';ctx.fillRect(-5,-7,22,14);ctx.fillStyle='#ffb4e6';ctx.fillRect(1,-5,12,2);ctx.fillStyle='#f0abfc';ctx.fillRect(5,2,7,2);
@@ -2891,7 +3241,7 @@ function drawActiveWeapon(x, y, angle, facing, def) {
     }
     else if(def.grp==='MAGIC')drawMagicWeaponShape(def);else if(def.arsenalUnit)drawArsenalUnitWeaponShape();else if (def.cat === 'melee') drawMeleeShape(def.sh); else drawGunShape(def.sh);
     // New shared finish: luminous spine, segmented casing and energized edges make every weapon silhouette distinct.
-    if(def.cat==='gun'){const L=(def.sh&&def.sh.L)||28,br=(def.sh&&def.sh.br)||12,col=def.col||'#7dd3fc';ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=hexA(col,.78);ctx.lineWidth=1.25;ctx.beginPath();ctx.moveTo(-5,-2);ctx.lineTo(Math.max(4,L-5),-1);ctx.stroke();ctx.fillStyle=hexA(col,.45);ctx.fillRect(Math.max(1,L*.28),-4,Math.max(3,L*.18),2);ctx.strokeStyle=hexA(col,.8);ctx.strokeRect(L+br-3,-3,3,6);ctx.restore();}else if(def.cat==='melee'){const col=def.col||'#7dd3fc',len=(def.sh&&def.sh.len)||56;ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=hexA(col,.72);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(4,0);ctx.lineTo(len*.82,-1);ctx.stroke();ctx.fillStyle=hexA(col,.45);ctx.beginPath();ctx.arc(len*.82,0,2.2,0,Math.PI*2);ctx.fill();ctx.restore();}
+    if(def.cat==='gun'){const L=(def.sh&&def.sh.L)||28,br=(def.sh&&def.sh.br)||12,col=def.col||'#7dd3fc';ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=hexA(col,.78);ctx.lineWidth=1.25;ctx.beginPath();ctx.moveTo(-5,-2);ctx.lineTo(Math.max(4,L-5),-1);ctx.stroke();ctx.fillStyle=hexA(col,.45);ctx.fillRect(Math.max(1,L*.28),-4,Math.max(3,L*.18),2);ctx.strokeStyle=hexA(col,.8);ctx.strokeRect(L+br-3,-3,3,6);ctx.restore();}else if(def.cat==='melee'&&def.id!=='longinus_spear'){const col=def.col||'#7dd3fc',len=(def.sh&&def.sh.len)||56;ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle=hexA(col,.72);ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(4,0);ctx.lineTo(len*.82,-1);ctx.stroke();ctx.fillStyle=hexA(col,.45);ctx.beginPath();ctx.arc(len*.82,0,2.2,0,Math.PI*2);ctx.fill();ctx.restore();}
     ctx.restore();
 }
 
@@ -3980,6 +4330,7 @@ const wmTitle = document.querySelector('.wm-title');
 const startScreen = document.getElementById('start-screen');
 const pauseScreen = document.getElementById('pause-screen');
 let gameStarted = false, paused = false, pauseAt = 0, idleDrawAt = 0;
+let openingMovieActive = true, endingMovieActive = false, cinematicAudioMuted = false, endingMovieFinishFn = null, endingMovieAudio = null, epilogueActive = false, epilogueFinishHandler = null;
 
 // ---------------- BGM管理 ----------------
 // HTMLファイルと同じフォルダに各BGMを配置してください。0-1～0-4は unknown.mp3、0-0は無音です。
@@ -4002,6 +4353,7 @@ for (const audio of Object.values(MUSIC_TRACKS)) {
     audio.volume = 0.55;
 }
 function desiredMusicKey() {
+    if (openingMovieActive || cinematicAudioMuted || endingMovieActive) return null;
     if (!gameStarted) return 'title';
     // 0-0 is intentionally silent. The other zero-route maps share unknown.mp3.
     if (activeStageId === 'stage_0_0') return null;
@@ -4033,39 +4385,166 @@ function primeMusicForStage(stageId) {
     track.preload = 'auto';
     try { if (track.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) track.load(); } catch (_) {}
 }
+let MUSIC_TARGET_VOLUME = 0.55;
+const MUSIC_FADE_IN_MS = 1500;
+const MUSIC_FADE_OUT_MS = 900;
+const musicFadeTokens = new WeakMap();
+function rampMusicVolume(audio, targetVolume, duration, onComplete) {
+    if (!audio) return;
+    const token = (musicFadeTokens.get(audio) || 0) + 1;
+    musicFadeTokens.set(audio, token);
+    const from = Number(audio.volume) || 0;
+    const start = performance.now();
+    const span = Math.max(1, Number(duration) || 1);
+    const frame = now => {
+        if (musicFadeTokens.get(audio) !== token) return;
+        const p = Math.min(1, Math.max(0, (now - start) / span));
+        const eased = p * p * (3 - 2 * p);
+        audio.volume = Math.max(0, Math.min(1, from + (targetVolume - from) * eased));
+        if (p < 1) requestAnimationFrame(frame);
+        else { audio.volume = targetVolume; if (typeof onComplete === 'function') onComplete(); }
+    };
+    requestAnimationFrame(frame);
+}
+function fadeOutMusicKey(key) {
+    const audio = MUSIC_TRACKS[key];
+    if (!audio) return;
+    rampMusicVolume(audio, 0, MUSIC_FADE_OUT_MS, () => {
+        // A newer request can cancel the fade via rampMusicVolume's token.
+        if (currentMusicKey !== key) {
+            audio.pause();
+            try { audio.currentTime = 0; } catch (_) {}
+            audio.volume = MUSIC_TARGET_VOLUME;
+        }
+    });
+}
 function syncMusic(forceRestart = false) {
     const key = desiredMusicKey();
-    // null is a deliberate silent state, not a missing track: stop the previous BGM immediately.
     if (key == null) {
-        if (currentMusicKey && MUSIC_TRACKS[currentMusicKey]) {
-            const previous = MUSIC_TRACKS[currentMusicKey];
-            previous.pause();
-            try { previous.currentTime = 0; } catch (_) {}
+        if (currentMusicKey) {
+            const oldKey = currentMusicKey;
+            currentMusicKey = null;
+            fadeOutMusicKey(oldKey);
         }
-        currentMusicKey = null;
         return;
     }
     const next = MUSIC_TRACKS[key];
     if (!next) return;
-    if (currentMusicKey !== key || forceRestart) {
-        if (currentMusicKey && MUSIC_TRACKS[currentMusicKey]) {
-            const previous = MUSIC_TRACKS[currentMusicKey];
-            previous.pause();
-            try { previous.currentTime = 0; } catch (_) {}
-        }
+    const previousKey = currentMusicKey;
+    const changed = previousKey !== key;
+    if (changed || forceRestart) {
+        if (previousKey && previousKey !== key) fadeOutMusicKey(previousKey);
         currentMusicKey = key;
+        if (forceRestart) {
+            next.pause();
+            try { next.currentTime = 0; } catch (_) {}
+        }
+        if (next.paused) {
+            next.volume = 0;
+            const playAttempt = next.play();
+            if (playAttempt && typeof playAttempt.then === 'function') {
+                playAttempt.then(() => { if (currentMusicKey === key) rampMusicVolume(next, MUSIC_TARGET_VOLUME, MUSIC_FADE_IN_MS); }).catch(() => {});
+            } else if (currentMusicKey === key) rampMusicVolume(next, MUSIC_TARGET_VOLUME, MUSIC_FADE_IN_MS);
+        } else {
+            rampMusicVolume(next, MUSIC_TARGET_VOLUME, MUSIC_FADE_IN_MS);
+        }
+        return;
     }
-    // ブラウザの自動再生制限で拒否された場合は、最初のユーザー操作時に再試行します。
+    // Retry after browsers block autoplay. Repeated key/pointer events do not restart an active fade.
     if (next.paused) {
+        next.volume = 0;
         const playAttempt = next.play();
-        if (playAttempt && typeof playAttempt.catch === 'function') playAttempt.catch(() => {});
+        if (playAttempt && typeof playAttempt.then === 'function') {
+            playAttempt.then(() => { if (currentMusicKey === key) rampMusicVolume(next, MUSIC_TARGET_VOLUME, MUSIC_FADE_IN_MS); }).catch(() => {});
+        }
     }
 }
-// ページ表示時にタイトルBGMを試し、再生制限があるブラウザでは最初の操作で再試行。
+// User gestures can retry autoplay; opening/ending films deliberately remain silent.
 document.addEventListener('pointerdown', () => syncMusic(), true);
 document.addEventListener('keydown', () => syncMusic(), true);
 syncMusic();
-const menuList = () => WEAPONS.filter(w => w.grp === MENU_GROUPS[menuGrp] && (menuMode !== 'inventory' || isWeaponOwned(w.id)));
+
+function beginOpeningCinematic() {
+    const overlay = document.getElementById('muyuu-opening-movie');
+    const log = document.getElementById('opening-terminal-log');
+    const fill = document.getElementById('opening-terminal-progress-fill');
+    const status = document.getElementById('opening-terminal-status');
+    const percent = document.getElementById('opening-terminal-percent');
+    if (!overlay || !log) { openingMovieActive = false; syncMusic(); return; }
+    // This sequence intentionally contains no Audio object and never calls play().
+    const lines = [
+        {type:'dim', text:'Microsoft Windows [Version 10.0.26100.2454]'},
+        {type:'dim', text:'(c) Microsoft Corporation. All rights reserved.'},
+        {type:'blank', text:''},
+        {type:'command', text:'C:\\MUYUU\\CLIENT> boot.exe --mode=silent --profile=2d-action'},
+        {type:'success', text:'[  OK  ] CLIENT CORE ................. initialized'},
+        {type:'wait', text:'[ WAIT ] FONT MATRIX ................. applying typefaces'},
+        {type:'success', text:'[  OK  ] LINE Seed JP ................ font face available'},
+        {type:'success', text:'[  OK  ] Square 721 .................. display face mapped'},
+        {type:'success', text:'[  OK  ] INPUT BUS ................... keyboard / virtual stick'},
+        {type:'success', text:'[  OK  ] CANVAS PIPELINE ............. 2D renderer ready'},
+        {type:'wait', text:'[ WAIT ] STAGE REGISTRY .............. loading 1-1 -> 16-F'},
+        {type:'success', text:'[  OK  ] SAVE DATA ................... local records checked'},
+        {type:'success', text:'[  OK  ] AUDIO POLICY ................ startup audio disabled'},
+        {type:'blank', text:''},
+        {type:'command', text:'C:\\MUYUU\\CLIENT> launch.exe --world MUYUU'},
+        {type:'success', text:'[ DONE ] Runtime initialized. Welcome, operator.'}
+    ];
+    let completed = 0;
+    let cancelled = false;
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const typeLine = async line => {
+        const row = document.createElement('div');
+        row.className = line.type === 'blank' ? 'terminal-dim' : 'terminal-' + line.type;
+        log.appendChild(row);
+        if (line.type === 'blank') { row.textContent = '\u00a0'; await delay(110); return; }
+        const text = line.text;
+        for (let i = 0; i < text.length; i++) {
+            if (cancelled) return;
+            row.textContent += text[i];
+            await delay(line.type === 'command' ? 8 : 4);
+        }
+        completed++;
+        const pct = Math.round(completed / lines.length * 100);
+        if (fill) fill.style.width = pct + '%';
+        if (percent) percent.textContent = pct + '%';
+        if (status) status.textContent = line.type === 'wait' ? 'WAITING FOR INITIALIZATION' : line.type === 'command' ? 'COMMAND PROCESSOR' : 'CLIENT BOOT / ' + pct + '%';
+        await delay(line.type === 'wait' ? 410 : 145);
+    };
+    const minDuration = delay(6200);
+    const fontsReady = Promise.race([
+        (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(() => {}) : Promise.resolve(),
+        delay(4400)
+    ]);
+    (async () => {
+        for (const line of lines) await typeLine(line);
+        await Promise.all([minDuration, fontsReady]);
+        if (cancelled) return;
+        if (status) status.textContent = 'CLIENT READY / SILENT BOOT COMPLETE';
+        if (percent) percent.textContent = '100%';
+        if (fill) fill.style.width = '100%';
+        const final = document.createElement('div');
+        final.className = 'terminal-success';
+        final.textContent = 'C:\\MUYUU\\CLIENT> _';
+        log.appendChild(final);
+        overlay.classList.add('cinema-out');
+        setTimeout(() => {
+            overlay.classList.add('is-concealed');
+            overlay.setAttribute('aria-hidden', 'true');
+            openingMovieActive = false;
+            syncMusic();
+        }, 860);
+    })().catch(error => {
+        console.warn('MUYUU startup terminal sequence skipped', error);
+        cancelled = true;
+        overlay.classList.add('cinema-out');
+        setTimeout(() => { overlay.classList.add('is-concealed'); overlay.setAttribute('aria-hidden','true'); openingMovieActive=false; syncMusic(); }, 860);
+    });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', beginOpeningCinematic, {once:true});
+else beginOpeningCinematic();
+
+const menuList = () => WEAPONS.filter(w => w.grp === MENU_GROUPS[menuGrp] && (menuMode !== 'inventory' || isWeaponOwned(w.id)) && (w.id !== 'longinus_spear' || !!(storyState?.flags?.final_boss_defeated || storyState?.endings?.includes('final'))));
 
 function drawWeaponPreview(cv, def) {
     const c2 = cv.getContext('2d');
@@ -4100,7 +4579,7 @@ function renderMenu() {
     if (menuIdx >= list.length) menuIdx = list.length - 1;
     if (menuIdx < 0) menuIdx = 0;
     wmTabs.innerHTML = MENU_GROUPS.map((g, i) => {
-        const count=WEAPONS.filter(w=>w.grp===g&&(menuMode!=='inventory'||isWeaponOwned(w.id))).length;
+        const count=WEAPONS.filter(w=>w.grp===g&&(menuMode!=='inventory'||isWeaponOwned(w.id))&&(w.id!=='longinus_spear'||!!(storyState?.flags?.final_boss_defeated||storyState?.endings?.includes('final')))).length;
         const disabled=menuMode==='inventory'&&count===0;
         return `<button class="wm-tab${i === menuGrp ? ' on' : ''}" data-g="${i}"${disabled?' disabled aria-disabled="true"':''}>${GRP_JP[g] || g}<small>${count}</small></button>`;
     }).join('');
@@ -4135,7 +4614,8 @@ function renderMenu() {
                 `<div class="wm-tags">${w.auto ? 'FULL-AUTO' : 'SEMI-AUTO'}${w.pellets > 1 ? ' ・ 散弾' : ''}${w.pierce ? ' ・ 貫通' : ''}${w.explode ? ' ・ 爆発' : ''}${w.noise < 150 ? ' ・ 消音' : ''}</div>`;
     }
     const trait = w.trait || {name:'標準特性',desc:'固有特性なし。'};
-    const purchase=isWeaponOwned(w.id)?'<div class="card-muted" style="margin-top:9px;color:#86efac">UNLOCKED / 使用可能</div>':`<div class="card-message" style="margin-top:9px">ライセンス価格：${w.cost.toLocaleString('ja-JP')} G</div><button class="card-btn primary" data-buy-weapon="${w.id}" type="button" style="width:100%;margin-top:8px" ${typeof cardState!=='undefined'&&cardState.money>=w.cost?'':'disabled'}>購入する · ${w.cost.toLocaleString('ja-JP')} G</button><p class="card-muted">購入はカード研究画面のショップからも行えます。</p>`;
+    const postGamePromotionUnlocked = !!(storyState?.flags?.final_boss_defeated || storyState?.endings?.includes('final'));
+    const purchase=isWeaponOwned(w.id)?'<div class="card-muted" style="margin-top:9px;color:#86efac">UNLOCKED / 使用可能</div>':(w.unlockCondition==='promo_code'?'<div class="card-message" style="margin-top:9px">'+('CLASSIFIED / UNKNOWN SPECIAL EQUIPMENT')+'</div>':`<div class="card-message" style="margin-top:9px">ライセンス価格：${w.cost.toLocaleString('ja-JP')} G</div><button class="card-btn primary" data-buy-weapon="${w.id}" type="button" style="width:100%;margin-top:8px" ${typeof cardState!=='undefined'&&cardState.money>=w.cost?'':'disabled'}>購入する · ${w.cost.toLocaleString('ja-JP')} G</button><p class="card-muted">購入はカード研究画面のショップからも行えます。</p>`);
     const genre=w.grp==='MAGIC'?'<div class="wm-tags">ARCANE / 魔法武器</div>':w.specialProjectile?'<div class="wm-tags">SPECIAL PROJECTILE / 特殊弾頭</div>':'';
     wmDetail.innerHTML = `<div class="wm-dname" style="color:${w.col}">${w.name}</div><div class="wm-djp">${w.jp}</div><p>${w.desc}</p>${stats}${genre}<div class="wm-trait" style="--trait-col:${w.col}"><b>WEAPON TRAIT / 固有特性</b><strong>${trait.name}</strong><p>${trait.desc}</p></div>${purchase}`;
 }
@@ -4326,7 +4806,7 @@ function resetAllGameData() {
 
 // タイトル / ポーズ / インベントリの導線
 function startGame() {
-    if (gameStarted) return;
+    if (gameStarted || openingMovieActive || endingMovieActive) return;
     if (typeof window.muyuuPlayLogoSfx === 'function') window.muyuuPlayLogoSfx();
     const savedAtStart = pendingSavedGame;
     const savedResume = savedAtStart && savedAtStart.hasRuntime && savedAtStart.stageId === activeStageId
@@ -6536,14 +7016,80 @@ function drawConveyorZone(z, t) {
     ctx.fillStyle = 'rgba(190,242,100,.55)'; ctx.beginPath(); ctx.arc(z.x, groundY - 2, 6, 0, Math.PI * 2); ctx.arc(z.x + z.w, groundY - 2, 6, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
 }
+function isMobileControlMode(){return document.documentElement.dataset.controlMode==='mobile';}
+function adaptControlInstructionText(value){
+    let text=String(value==null?'':value);
+    if(!isMobileControlMode()) return text;
+    const rules=[
+        [/A\s*\/\s*D\s*(?:で)?\s*移動/g,'MOVEスティックで移動'],
+        [/W\s*(?:で)?\s*ジャンプ/g,'JUMPボタンでジャンプ'],
+        [/Z\s*(?:で)?\s*攻撃/g,'ATTACKボタンで攻撃'],
+        [/X\s*\/\s*C\s*(?:で)?\s*武器切替/g,'CHANGEボタンで武器切替'],
+        [/Shift\s*\+\s*方向\s*(?:で)?\s*ブースト/g,'BOOSTを押しながらMOVEスティックを倒してブースト'],
+        [/Shift\s*\+\s*方向/g,'BOOST + MOVEスティック'],
+        [/S\s*\+\s*W\s*(?:で)?\s*足場を降りる/g,'MOVEスティックを下へ倒して足場を降りる'],
+        [/S\s*\+\s*W/g,'MOVEスティックを下へ倒す'],
+        [/R\s*(?:で)?\s*リロード/g,'RELOADボタンでリロード'],
+        [/Q\s*\/\s*E\s*(?:で)?\s*前後の武器(?:だ)?[。]?/g,'CHANGEボタンで次の武器へ切り替える。'],
+        [/Q\s*\/\s*E\s*武器選択/g,'CHANGE 武器切替'],
+        [/X\s*\/\s*C\s*武器切替/g,'CHANGE 武器切替'],
+        [/A\s*\/\s*D\s+移動/g,'MOVEスティック 移動'],
+        [/W\s+ジャンプ/g,'JUMPボタン ジャンプ'],
+        [/Z\s+攻撃/g,'ATTACK 攻撃'],
+        [/Shift\s*\+\s*方向/g,'BOOST + MOVEスティック'],
+        [/S\s*\+\s*W/g,'スティック下'],
+        [/R\s+リロード/g,'RELOAD リロード'],
+        [/Q\s*\/\s*E\s+武器選択/g,'CHANGE 武器切替'],
+        [/F\s+NPCと話す/g,'INTERACT NPCと話す'],
+        [/J\s*クエスト\s*\/\s*V\s*アタッチメント/g,'PAUSEメニュー クエスト／アタッチメント'],
+        [/I\s*インベントリ/g,'BAG 武器庫'],
+        [/K\s*カードクラフト/g,'CARD カード編成'],
+        [/X\s*\/\s*C\s*で武器切替/g,'CHANGEボタンで武器切替'],
+        [/A\s*\/\s*D\s*で移動/g,'MOVEスティックで移動'],
+        [/W\s*でジャンプ/g,'JUMPボタンでジャンプ'],
+        [/Z\s*で攻撃/g,'ATTACKボタンで攻撃'],
+        [/Q\s*\/\s*E/g,'CHANGEボタン'],
+        [/クエストは\s*J、アタッチメントは\s*V、カードは\s*K、インベントリは\s*I/g,'クエスト／アタッチメントはPAUSEメニュー、カードはCARD、武器庫はBAGから開け'],
+        [/K\s*のカード画面/g,'CARDのカード画面'],
+        [/カードは\s*K/g,'カードはCARDボタン'],
+        [/インベントリは\s*I/g,'武器庫はBAGボタン'],
+        [/クエストは\s*J/g,'クエストはPAUSEメニューから'],
+        [/アタッチメントは\s*V/g,'アタッチメントはPAUSEメニューから'],
+        [/H\s*で操作ガイドを開け/g,'画面左下の操作ガイドを開け'],
+        [/H\s*操作/g,'操作ガイド'],
+        [/F\s*NPC会話/g,'INTERACT NPC会話'],
+        [/K\s*カード/g,'CARD カード編成'],
+        [/V\s*アタッチメント/g,'PAUSEメニュー アタッチメント'],
+        [/J\s*クエスト/g,'PAUSEメニュー クエスト'],
+        [/I\s*インベントリ/g,'BAG 武器庫'],
+        [/Tab\s*武器選択[^&|。]*/g,'CHANGE 次の武器へ'],
+        [/方向キー×2/g,'MOVEスティックを素早く左右へ倒す'],
+        [/移動キーを270ms以内に2回押すとクイックブースト/g,'MOVEスティックを素早く左右へ2回倒すとクイックブースト'],
+        [/操作ガイドを表示する\s*·\s*H/g,'操作ガイドを表示する'],
+        [/操作ガイドを開く\s*·\s*H/g,'操作ガイドを開く']
+    ];
+    for(const [re,replacement] of rules) text=text.replace(re,replacement);
+    return text;
+}
+window.MUYUU_updateControlModeHints=function(){
+    const mobile=isMobileControlMode();
+    const toggle=document.getElementById('controls-toggle');
+    if(toggle) toggle.innerHTML=mobile?'操作ガイド':'操作ガイド <span class="key">H</span>';
+    const startBtn=document.querySelector('#start-controls-btn small');
+    if(startBtn) startBtn.textContent=mobile?'操作ガイドを表示する':'操作ガイドを表示する · H';
+    const layer=document.getElementById('ui-layer');
+    if(layer) layer.dataset.controlMode=mobile?'mobile':'pc';
+};
+
 function drawSignBoard(z) {
+    const lines = isMobileControlMode() ? z.lines.map(adaptControlInstructionText) : z.lines;
     ctx.save(); ctx.font = '700 13px Square721BT, Yu Gothic UI, sans-serif'; ctx.textAlign = 'center';
-    let w = 0; for (const s of z.lines) w = Math.max(w, ctx.measureText(s).width);
-    w += 26; const h = z.lines.length * 16 + 12, by = groundY - 58 - h;
+    let w = 0; for (const s of lines) w = Math.max(w, ctx.measureText(s).width);
+    w += 26; const h = lines.length * 16 + 12, by = groundY - 58 - h;
     ctx.strokeStyle = '#3a4a5c'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(z.x, groundY); ctx.lineTo(z.x, by + h); ctx.stroke();
     ctx.fillStyle = 'rgba(8,24,30,.92)'; ctx.fillRect(z.x - w / 2, by, w, h);
     ctx.strokeStyle = 'rgba(57,243,208,.7)'; ctx.lineWidth = 1.5; ctx.strokeRect(z.x - w / 2, by, w, h);
-    ctx.fillStyle = '#bff7ec'; z.lines.forEach((s, i) => ctx.fillText(s, z.x, by + 18 + i * 16));
+    ctx.fillStyle = '#bff7ec'; lines.forEach((line, i) => ctx.fillText(line, z.x, by + 18 + i * 16));
     ctx.restore();
 }
 function drawIceZone(z, t) {
@@ -7272,8 +7818,360 @@ function syncStagePickers() {
     if(b) b.textContent=`${def.levelCode} をクリアすると次のステージへ自動で進みます${def.bossArena?'（ボス撃破が必要）':''}。 ${def.description}`;
     const n=document.getElementById('ui-stage-name'); if(n) n.textContent=def.en;
 }
+
+const ENDING_STAGE_HISTORY_KEY = 'muyuu_ending_stage_history_v1';
+const ENDING_STAGE_HISTORY_LIMIT = 80;
+function readEndingStageHistory() {
+    try {
+        const raw = localStorage.getItem(ENDING_STAGE_HISTORY_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed.filter(x => x && typeof x.id === 'string' && STAGE_DEFS[x.id]) : [];
+    } catch (_) { return []; }
+}
+function recordEndingStageSnapshot(stageId, replaceExisting = false) {
+    if (!gameStarted || !stageId || !STAGE_DEFS[stageId]) return;
+    const history = readEndingStageHistory();
+    if (!replaceExisting && history.some(item => item.id === stageId)) return;
+    const def = STAGE_DEFS[stageId];
+    let image = '';
+    try {
+        const source = document.getElementById('gameCanvas');
+        if (source && source.width > 0 && source.height > 0) {
+            const thumb = document.createElement('canvas');
+            thumb.width = 480; thumb.height = 270;
+            const g = thumb.getContext('2d', {alpha:false});
+            g.fillStyle = def.palette?.ground || '#030711'; g.fillRect(0,0,thumb.width,thumb.height);
+            g.drawImage(source,0,0,thumb.width,thumb.height);
+            image = thumb.toDataURL('image/jpeg',0.36);
+        }
+    } catch (error) { console.warn('Ending movie snapshot skipped', error); }
+    const item = {id:stageId, code:def.levelCode||stageId, name:def.name||stageId, en:def.en||stageId, description:def.description||'', accent:def.palette?.accent||'#43dfff', image, at:Date.now()};
+    const idx = history.findIndex(x => x.id === stageId);
+    if (idx >= 0) history.splice(idx,1);
+    history.push(item);
+    while (history.length > ENDING_STAGE_HISTORY_LIMIT) history.shift();
+    // A full localStorage should never block gameplay: trim older snapshots until a write succeeds.
+    while (history.length) {
+        try { localStorage.setItem(ENDING_STAGE_HISTORY_KEY, JSON.stringify(history)); return; }
+        catch (_) { history.shift(); }
+    }
+}
+function sampleEvenly(items, maxCount) {
+    if (items.length <= maxCount) return items.slice();
+    const out=[];
+    for(let i=0;i<maxCount;i++) out.push(items[Math.round(i*(items.length-1)/Math.max(1,maxCount-1))]);
+    return out.filter((item,i)=>out.findIndex(x=>x.id===item.id)===i);
+}
+const ENDING_FILM_DURATION_MS = 186000; // ending.mp3 is 3:06.
+const ENDING_FILM_MONTAGE_MS = 112000;
+// Warm the ending soundtrack silently during normal client initialization; it is never played here.
+if (!endingMovieAudio) { endingMovieAudio = new Audio('ending.mp3'); endingMovieAudio.preload = 'auto'; endingMovieAudio.loop = false; endingMovieAudio.volume = 0; try { endingMovieAudio.load(); } catch (_) {} }
+function buildEndingMovieSlides() {
+    const records = readEndingStageHistory();
+    const historyById = new Map(records.map(item => [item.id, item]));
+    const stageList = Object.entries(STAGE_DEFS).map(([id, def]) => {
+        const code = String(def.levelCode || '');
+        const match = code.match(/^(\d+)-(\d+|F)$/i);
+        if (!match) return null;
+        const major = Number(match[1]);
+        if (major < 1 || major > 16) return null;
+        const sub = match[2].toUpperCase();
+        return {id, def, code, major, sub, subOrder: sub === 'F' ? 999 : Number(sub)};
+    }).filter(Boolean).sort((a,b) => a.major - b.major || a.subOrder - b.subOrder);
+    return stageList.map(({id,def,code},index) => {
+        const record = historyById.get(id);
+        return {
+            id, code, kicker:`${code} / STAGE ARCHIVE`,
+            title:record?.name || def.name || def.en || code,
+            description:record?.description || def.description || 'この区画にも、確かに歩いた記録が残っている。',
+            accent:record?.accent || def.palette?.accent || '#e8f5ff',
+            image:record?.image || '',
+            foot:`FIELD RECORD · ${code}`,
+            index
+        };
+    });
+}
+function finishEndingMovie() { if (typeof endingMovieFinishFn === 'function') endingMovieFinishFn(); }
+function startEndingMovie(done) {
+    const overlay = document.getElementById('muyuu-ending-movie');
+    if (!overlay) { if (typeof done === 'function') done(); return; }
+    if (endingMovieActive) return;
+    recordEndingStageSnapshot(activeStageId, true);
+    const slides = buildEndingMovieSlides();
+    const mainFrame = document.getElementById('ending-movie-main-frame');
+    const staffRoll = document.getElementById('ending-movie-staffroll');
+    const staffTrack = document.getElementById('ending-movie-staffroll-track');
+    const imageEl = document.getElementById('ending-movie-image');
+    const kickerEl = document.getElementById('ending-movie-kicker');
+    const titleEl = document.getElementById('ending-movie-title');
+    const descEl = document.getElementById('ending-movie-description');
+    const counterEl = document.getElementById('ending-movie-counter');
+    const footEl = document.getElementById('ending-movie-footnote');
+    const timelineEl = document.getElementById('ending-movie-timeline');
+    const audioStartButton = document.getElementById('ending-movie-audio-start');
+    const stage17BgmLock = document.getElementById('ending-bgm-stage17-lock');
+    const stage17BgmTracks = document.getElementById('ending-bgm-stage17-tracks');
+    let stage17AlreadyCleared = false;
+    try { stage17AlreadyCleared = !!(storyState && storyState.flags && storyState.flags.stage17_cleared); } catch (_) {}
+    if (stage17BgmLock) stage17BgmLock.hidden = stage17AlreadyCleared;
+    if (stage17BgmTracks) stage17BgmTracks.hidden = !stage17AlreadyCleared;
+    endingMovieActive = true;
+    cinematicAudioMuted = true;
+    paused = true; pauseAt = performance.now();
+    for (const k in keys) keys[k] = false;
+    syncMusic();
+    overlay.classList.remove('is-concealed','cinema-out');
+    overlay.setAttribute('aria-hidden','false');
+    if (mainFrame) mainFrame.classList.remove('is-hidden');
+    if (staffRoll) { staffRoll.hidden = true; staffRoll.setAttribute('aria-hidden','true'); }
+    if (audioStartButton) audioStartButton.hidden = true;
+    timelineEl.innerHTML = slides.map((_,i)=>`<span data-index="${i}"></span>`).join('');
+
+    let finished = false, started = false, audioClock = false, animationFrame = 0, filmStartAt = 0, finishTimer = 0, lastSlide = -1, staffRollStarted = false;
+    const duration = ENDING_FILM_DURATION_MS;
+    const montageDuration = ENDING_FILM_MONTAGE_MS;
+    const stageInterval = montageDuration / Math.max(1, slides.length);
+    const audio = endingMovieAudio || new Audio('ending.mp3');
+    endingMovieAudio = audio;
+    audio.preload = 'auto'; audio.loop = false; audio.volume = 0;
+
+    const showSlide = index => {
+        if (!slides.length) return;
+        index = Math.max(0, Math.min(slides.length-1, index));
+        const slide = slides[index];
+        lastSlide = index;
+        const stage = document.getElementById('ending-movie-stage');
+        if (stage) stage.style.setProperty('--cine-accent', slide.accent || '#e8f5ff');
+        if (kickerEl) kickerEl.textContent = slide.kicker;
+        if (titleEl) titleEl.textContent = slide.title;
+        if (descEl) descEl.textContent = slide.description;
+        if (counterEl) counterEl.textContent = `STAGE ${String(index+1).padStart(2,'0')} / ${String(slides.length).padStart(2,'0')}`;
+        if (footEl) footEl.textContent = slide.foot || `FIELD RECORD · ${slide.code}`;
+        if (imageEl) {
+            imageEl.classList.remove('shown');
+            imageEl.onload = () => imageEl.classList.add('shown');
+            imageEl.onerror = () => imageEl.classList.remove('shown');
+            if (slide.image) { imageEl.src = slide.image; if (imageEl.complete && imageEl.naturalWidth > 0) imageEl.classList.add('shown'); }
+            else imageEl.removeAttribute('src');
+        }
+        if (timelineEl) timelineEl.querySelectorAll('span').forEach((el,j)=>el.classList.toggle('active', j <= index));
+        if (titleEl) { titleEl.style.animation='none'; void titleEl.offsetWidth; titleEl.style.animation='cineRiseIn .7s both'; }
+    };
+    const closeMovie = () => {
+        if (finished) return;
+        finished = true;
+        if (animationFrame) cancelAnimationFrame(animationFrame);
+        if (finishTimer) clearTimeout(finishTimer);
+        endingMovieFinishFn = null;
+        endingMovieActive = false;
+        if (endingMovieAudio) {
+            try { endingMovieAudio.pause(); endingMovieAudio.currentTime = 0; endingMovieAudio.volume = 0; } catch (_) {}
+            // Keep the muted media element cached so repeated 16-F clears can replay without reloading the file.
+        }
+        if (audioStartButton) audioStartButton.hidden = true;
+        overlay.classList.add('cinema-out');
+        setTimeout(() => {
+            overlay.classList.add('is-concealed');
+            overlay.setAttribute('aria-hidden','true');
+            if (mainFrame) mainFrame.classList.remove('is-hidden');
+            if (staffRoll) { staffRoll.hidden = true; staffRoll.setAttribute('aria-hidden','true'); }
+            if (typeof done === 'function') done();
+        }, 780);
+    };
+    endingMovieFinishFn = closeMovie;
+
+    const beginClock = () => {
+        if (started || finished) return;
+        started = true;
+        filmStartAt = performance.now();
+        finishTimer = setTimeout(closeMovie, duration);
+        const frame = () => {
+            if (finished || !started) return;
+            let elapsed = performance.now() - filmStartAt;
+            if (audioClock && audio && Number.isFinite(audio.currentTime)) elapsed = Math.max(elapsed, audio.currentTime * 1000);
+            elapsed = Math.min(duration, Math.max(0, elapsed));
+
+            if (elapsed < montageDuration) {
+                if (mainFrame) mainFrame.classList.remove('is-hidden');
+                if (staffRoll) { staffRoll.hidden = true; staffRoll.setAttribute('aria-hidden','true'); }
+                const index = Math.min(slides.length - 1, Math.floor(elapsed / stageInterval));
+                if (index !== lastSlide) showSlide(index);
+            } else {
+                if (mainFrame) mainFrame.classList.add('is-hidden');
+                if (staffRoll && staffRoll.hidden) {
+                    staffRoll.hidden = false;
+                    staffRoll.setAttribute('aria-hidden','false');
+                }
+                if (!staffRollStarted && staffTrack) {
+                    staffRollStarted = true;
+                    staffTrack.style.animation = 'none';
+                    staffTrack.style.transform = 'translateY(100vh)';
+                    void staffTrack.offsetHeight;
+                    staffTrack.style.animation = `endingStaffRoll ${Math.max(1,(duration-montageDuration)/1000)}s linear forwards`;
+                }
+                if (counterEl) counterEl.textContent = 'CREDITS / THANK YOU';
+            }
+
+            if (audio && !audio.paused) {
+                const fadeIn = Math.min(1, elapsed / 1600);
+                const fadeOut = elapsed <= 184400 ? 1 : Math.max(0, (duration - elapsed) / (duration - 184400));
+                audio.volume = Math.max(0, Math.min(0.62, 0.62 * fadeIn * fadeOut));
+            }
+            if (elapsed >= duration) { closeMovie(); return; }
+            animationFrame = requestAnimationFrame(frame);
+        };
+        showSlide(0);
+        animationFrame = requestAnimationFrame(frame);
+    };
+
+    // Let the previous stage theme finish its fade-out before starting the full 3:06 ending track.
+    setTimeout(() => {
+        if (finished) return;
+        try {
+            audio.currentTime = 0;
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.then === 'function') {
+                playPromise.then(() => { audioClock = true; beginClock(); }).catch(() => {
+                    // Some browsers require a fresh gesture for a new media element; keep the film timed and offer a start button.
+                    if (audioStartButton) audioStartButton.hidden = false;
+                    beginClock();
+                });
+            } else { audioClock = true; beginClock(); }
+        } catch (_) {
+            if (audioStartButton) audioStartButton.hidden = false;
+            beginClock();
+        }
+    }, 950);
+    if (audioStartButton) audioStartButton.onclick = () => {
+        if (finished) return;
+        audioStartButton.hidden = true;
+        try {
+            audio.currentTime = Math.min(ENDING_FILM_DURATION_MS / 1000, Math.max(0, (performance.now() - filmStartAt) / 1000));
+            const p = audio.play();
+            if (p && typeof p.then === 'function') p.then(() => { audioClock = true; }).catch(() => {});
+            else audioClock = true;
+        } catch (_) {}
+    };
+}
+document.getElementById('ending-movie-skip')?.addEventListener('click', finishEndingMovie);
+window.addEventListener('keydown', event => {
+    if (!endingMovieActive) return;
+    if (['Escape','Enter','Space','KeyX'].includes(event.code)) {
+        event.preventDefault(); event.stopPropagation();
+        if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+        finishEndingMovie();
+    }
+}, true);
+
+const ARSENAL_ENDING_LINES = [
+    '# Tokonagi : The Terminal Judgementの光が消え、凍結されていた記録が一斉に開放される。遠くの街に、停止していた避難灯が一つずつ点る。',
+    'TOKONAGI|最適解……を……確定、できない。観測されない未来は、脅威ではなく……余白……。',
+    '# MUYUUは、止められなかった命令と、あなたが選んだ道の両方を公開記録へ渡した。責任を消すための勝利ではない。これから判断をやり直すための始まりだ。',
+    'MUYUU|世界を救った、と簡単に言うことはできません。傷ついた人も、取り戻せない時間も残ります。それでも、未来を一つに閉じる装置は止まりました。これからは、誰もが異議を唱え、記録を確かめ、選び直せます。',
+    '@終端王座の残骸から、白い双翼ユニットが展開する。二振りの剣が手元へ収まり、翼端のノズルに青白い光が灯った。',
+    '# FINAL REWARD // アーセナルユニットを獲得。白い翼のジェット推進で飛行時間が2倍、飛行速度が1.8倍になる。剣を双剣として振るい、ジェットエネルギーを実体ソードビットへ変換して高速射出できる。',
+    'MUYUU|あなたの次の選択は、これまでの記録にはありません。……だからこそ、あなたが選んでください。'
+];
+function playArsenalEpilogue(done) {
+    const overlay = document.getElementById('muyuu-ending-epilogue');
+    const storyPanel = document.getElementById('ending-epilogue-story');
+    const summaryPanel = document.getElementById('ending-epilogue-summary');
+    const speakerEl = document.getElementById('ending-epilogue-speaker');
+    const textEl = document.getElementById('ending-epilogue-text');
+    const counterEl = document.getElementById('ending-epilogue-counter');
+    const hintEl = document.getElementById('ending-epilogue-hint');
+    const nextButton = document.getElementById('ending-epilogue-next');
+    const continueButton = document.getElementById('ending-epilogue-continue');
+    if (!overlay || !storyPanel || !summaryPanel) { if (typeof done === 'function') done(); return; }
+    epilogueActive = true;
+    epilogueFinishHandler = typeof done === 'function' ? done : null;
+    cinematicAudioMuted = true;
+    paused = true; pauseAt = performance.now();
+    for (const k in keys) keys[k] = false;
+    overlay.classList.add('active'); overlay.setAttribute('aria-hidden','false');
+    storyPanel.hidden = false; summaryPanel.hidden = true;
+    let index = 0, timer = 0, finished = false;
+    const closeToSummary = () => {
+        if (!epilogueActive || finished) return;
+        finished = true;
+        if (timer) clearTimeout(timer);
+        storyPanel.classList.add('epilogue-leaving');
+        setTimeout(() => {
+            if (!epilogueActive) return;
+            storyPanel.hidden = true;
+            summaryPanel.hidden = false;
+            summaryPanel.classList.add('epilogue-arriving');
+            if (hintEl) hintEl.textContent = 'MAIN STORY CLEAR / PRESS ENTER TO CREATE RESULT';
+            continueButton?.focus({preventScroll:true});
+        }, 900);
+    };
+    const renderLine = () => {
+        if (!epilogueActive || finished) return;
+        if (index >= ARSENAL_ENDING_LINES.length) { closeToSummary(); return; }
+        const raw = ARSENAL_ENDING_LINES[index];
+        let speaker = 'ARCHIVE NARRATION', text = raw, isReward = false;
+        if (raw.startsWith('# ')) { text = raw.slice(2); speaker = raw.startsWith('# FINAL REWARD') ? 'FINAL REWARD / ARSENAL UNIT' : 'ARCHIVE NARRATION'; isReward = raw.startsWith('# FINAL REWARD'); }
+        else if (raw.startsWith('@')) { text = raw.slice(1); speaker = 'VISUAL RECORD / ARSENAL UNIT DEPLOYMENT'; }
+        else if (raw.includes('|')) { const parts = raw.split('|'); speaker = parts.shift(); text = parts.join('|'); }
+        if (speakerEl) speakerEl.textContent = speaker;
+        if (textEl) {
+            textEl.classList.remove('is-reward');
+            textEl.style.animation = 'none'; void textEl.offsetWidth;
+            textEl.textContent = text;
+            if (isReward) textEl.classList.add('is-reward');
+            textEl.style.animation = 'epilogueLineIn .65s ease both';
+        }
+        if (counterEl) counterEl.textContent = `RECORD ${String(index+1).padStart(2,'0')} / ${String(ARSENAL_ENDING_LINES.length).padStart(2,'0')}`;
+        if (hintEl) hintEl.textContent = 'AUTO ADVANCE / ENTER TO CONTINUE';
+        const visibleNextButton = document.getElementById('ending-epilogue-next');
+        if (visibleNextButton) visibleNextButton.textContent = index === ARSENAL_ENDING_LINES.length-1 ? 'END RECORDS →' : 'NEXT RECORD →';
+        const dwell = Math.min(13500, Math.max(6200, 3700 + Array.from(text).length * 58));
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => { index++; renderLine(); }, dwell);
+    };
+    const advance = () => {
+        if (!epilogueActive) return;
+        if (summaryPanel && !summaryPanel.hidden) { finish(); return; }
+        if (finished) return;
+        if (timer) clearTimeout(timer);
+        index++;
+        renderLine();
+    };
+    const finish = () => {
+        if (!epilogueActive) return;
+        if (timer) clearTimeout(timer);
+        epilogueActive = false;
+        overlay.classList.remove('active'); overlay.setAttribute('aria-hidden','true');
+        const callback = epilogueFinishHandler; epilogueFinishHandler = null;
+        setTimeout(() => { if (typeof callback === 'function') callback(); }, 700);
+    };
+    // Overwrite handlers on each viewing so replaying 16-F cannot stack duplicate listeners.
+    if (nextButton) nextButton.onclick = advance;
+    if (continueButton) continueButton.onclick = finish;
+    window.__muyuuEpilogueAdvance = advance;
+    window.__muyuuEpilogueFinish = finish;
+    renderLine();
+}
+window.addEventListener('keydown', event => {
+    if (!epilogueActive) return;
+    const key = event.code;
+    if (['Enter','Space','KeyX'].includes(key)) {
+        event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+        if (document.getElementById('ending-epilogue-summary')?.hidden === false) window.__muyuuEpilogueFinish?.();
+        else window.__muyuuEpilogueAdvance?.();
+    } else if (key === 'Escape') {
+        event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation?.();
+        const panel = document.getElementById('ending-epilogue-summary');
+        if (panel && panel.hidden) {
+            const btn = document.getElementById('ending-epilogue-next');
+            if (btn) btn.click();
+        } else window.__muyuuEpilogueFinish?.();
+    }
+}, true);
+
 function applyStagePreset(id, reset=true, quiet=false) {
     if(!STAGE_DEFS[id]) id='tutorial';
+    if (gameStarted && activeStageId && activeStageId !== id) recordEndingStageSnapshot(activeStageId);
     // Preloaded stage templates are cloned to isolate runtime-mutated gimmick/entity state.
     const cachedLayout=STAGE_LAYOUT_PRELOAD_CACHE.get(id);
     const layout=cachedLayout ? cloneData(cachedLayout) : createStageLayout(id);
@@ -7482,7 +8380,7 @@ function performNPCInteraction(targetNpc=null){
     }
     const list=getStageNPCList();
     const npc=targetNpc?(list.find(n=>n.id===targetNpc.id)||null):nearestNPC(320);
-    if(!npc){showGameToast('NPCが近くにいません。頭上に「F : TALK」が出る位置まで近づいてください');return false;}
+    if(!npc){showGameToast(isMobileControlMode()?'NPCが近くにいません。頭上に「INTERACT」が出る位置まで近づいてください':'NPCが近くにいません。頭上に「F : TALK」が出る位置まで近づいてください');return false;}
     if(!canTalkToNPC(npc)){showGameToast('NPCにもう少し近づいてください');return false;}
     if(!npc.dlg || !npc.dlg.nodes){showGameToast('このNPCの会話データを読み込めませんでした');return false;}
     player.facing=npc.x>=player.x?1:-1;
@@ -7725,25 +8623,30 @@ function playEnding(done) {
 function triggerFinalEnding(){
     if(finalEndingStarted)return;
     finalEndingStarted=true;
-    showGameToast('TOKONAGI SIGNATURE LOST / TERMINAL CORE COLLAPSED');
-    setTimeout(()=>{
-        const finish=()=>{
-            if(!storyState.endings.includes('final'))storyState.endings.push('final');
-            storyState.flags.final_boss_defeated=1;storyState.flags.arsenal_unit_unlocked=1;storyState.flags.stage17_unlocked=0;saveStoryState();updateStage17Availability();
-            unlockPositronSniper();
-            returnToTitle();applyStagePreset('tutorial',true,true);
-            unlockArsenalUnit(); // タイトルへ戻した後に受け取り・装備し、報酬が初期武器に戻されないようにする。
+    recordEndingStageSnapshot(activeStageId, true);
+    cinematicAudioMuted=true;
+    syncMusic(); // Fade the final-boss theme out before the 3:06 ending score begins.
+    const openResult = () => {
+        // Capture the live clear-state before unlocking/equipping the final reward or resetting the stage.
+        let clearSnapshot = null;
+        try { clearSnapshot = window.__muyuuCaptureClearSnapshot ? window.__muyuuCaptureClearSnapshot() : null; } catch (error) { console.warn('Clear result snapshot failed', error); }
+        if(!storyState.endings.includes('final'))storyState.endings.push('final');
+        storyState.flags.final_boss_defeated=1;storyState.flags.arsenal_unit_unlocked=1;storyState.flags.stage17_unlocked=0;saveStoryState();updateStage17Availability();
+        unlockPositronSniper();
+        unlockArsenalUnit();
+        const returnToHub = () => {
+            cinematicAudioMuted=false;
+            returnToTitle();applyStagePreset(STAGE_ORDER[0],true,true);
+            unlockArsenalUnit(); // Ensure the reward is equipped after title-stage initialization.
             syncMusic();
             showGameToast('ARSENAL UNIT ACQUIRED / アーセナルユニット獲得');
             finalEndingStarted=false;
         };
-        const tryOpenEnding=()=>{
-            if(activeStageId!=='final_16'){finalEndingStarted=false;return;}
-            // メニュー表示中などで会話を開始できない場合、プレイヤーが閉じるまで再試行する。
-            if(!openScene('arsenal_ending',finish))setTimeout(tryOpenEnding,350);
-        };
-        tryOpenEnding();
-    },1050);
+        if (window.__muyuuShowClearResult) window.__muyuuShowClearResult(clearSnapshot || {}, returnToHub);
+        else returnToHub();
+    };
+    // The ending film and epilogue finish first; the player then creates a named shareable result.
+    startEndingMovie(()=>playArsenalEpilogue(openResult));
 }
 function playStageStory() {
     const sid = STORY_STAGE[activeStageId]; if (!sid || storyState.seen[sid]) return;
@@ -7784,7 +8687,7 @@ function dlgRenderChoices() {
     d.choices.forEach((c, i) => {
         const b = document.createElement('button'); b.type = 'button'; b.className = 'dialogue-choice' + (i === 0 ? ' sel' : ''); b.dataset.i = String(i);
         const n = document.createElement('span'); n.className = 'num'; n.textContent = String(i + 1);
-        b.appendChild(n); b.appendChild(document.createTextNode(c.t)); E.choices.appendChild(b);
+        b.appendChild(n); b.appendChild(document.createTextNode(adaptControlInstructionText(c.t))); E.choices.appendChild(b);
     });
 }
 function dlgHighlight() { const d = activeDialogue; document.querySelectorAll('#dialogue-choices .dialogue-choice').forEach((b, i) => b.classList.toggle('sel', i === d.sel)); }
@@ -7804,7 +8707,7 @@ function dlgEnterNode(key) {
     d.key = key; d.node = n; d.idx = 0; d.fxDone = false; d.choices = null; d.sel = 0;
     if (n.hub) {
         d.lines = []; d.choices = dlgHubChoices(d);
-        dlgShowText({who:'', t:n.prompt || ('(' + d.npc.name + 'に話しかけた。何を話す？)'), cls:'narr', color:d.npc.color});
+        dlgShowText({who:'', t:adaptControlInstructionText(n.prompt || ('(' + d.npc.name + 'に話しかけた。何を話す？)')), cls:'narr', color:d.npc.color});
         dlgRenderChoices(); return;
     }
     d.lines = (n.lines || []).filter(l => typeof l === 'string' || condOK(l.if));
@@ -7813,12 +8716,14 @@ function dlgEnterNode(key) {
 }
 function dlgShowLine() {
     const d = activeDialogue, E = dlgEls();
-    dlgShowText(parseDialogueLine(d.lines[d.idx], d.npc));
+    const shownLine=parseDialogueLine(d.lines[d.idx], d.npc);
+    shownLine.t=adaptControlInstructionText(shownLine.t);
+    dlgShowText(shownLine);
     const last = d.idx >= d.lines.length - 1;
     d.choices = null;
     if (last && d.node.choices) { applyNodeEffects(d.node); d.fxDone = true; d.choices = d.node.choices.filter(c => condOK(c.if)); }
     dlgRenderChoices();
-    E.next.textContent = (last && !d.node.next && !d.node.choices) ? '会話終了' : 'つづき [Enter]';
+    E.next.textContent = (last && !d.node.next && !d.node.choices) ? '会話終了' : (isMobileControlMode() ? 'つづき（タップ）' : 'つづき [Enter]');
 }
 function dlgFinishNode() {
     const d = activeDialogue; if (!d) return;
@@ -7991,7 +8896,7 @@ function drawNPCs(){
         ctx.save();ctx.globalAlpha=.22;ctx.fillStyle=npc.color||'#7dd3fc';ctx.beginPath();ctx.ellipse(npc.x,base+1,19,4,0,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
         ctx.strokeStyle=npc.color||'#7dd3fc';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(npc.x,base-39);ctx.lineTo(npc.x,base-18);ctx.moveTo(npc.x,base-34);ctx.lineTo(npc.x-11,base-26);ctx.moveTo(npc.x,base-34);ctx.lineTo(npc.x+12,base-26);ctx.moveTo(npc.x,base-18);ctx.lineTo(npc.x-9,base-2);ctx.moveTo(npc.x,base-18);ctx.lineTo(npc.x+9,base-2);ctx.stroke();
         ctx.fillStyle=npc.color||'#7dd3fc';ctx.beginPath();ctx.arc(npc.x,base-49,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(5,10,18,.9)';ctx.fillRect(npc.x-54,base-72,108,15);ctx.strokeStyle=npc.color||'#7dd3fc';ctx.lineWidth=1;ctx.strokeRect(npc.x-54,base-72,108,15);ctx.fillStyle='#e8f5ff';ctx.font='12px Square721BT, Yu Gothic UI, sans-serif';ctx.textAlign='center';ctx.fillText(npc.name,npc.x,base-61);
-        if(near){ctx.fillStyle='#07101a';ctx.fillRect(npc.x-36,base-92,72,16);ctx.strokeStyle='#fcd34d';ctx.strokeRect(npc.x-36,base-92,72,16);ctx.fillStyle='#fef3c7';ctx.font='bold 12px Square721BT, Yu Gothic UI, sans-serif';ctx.fillText('F : TALK',npc.x,base-81);}
+        if(near){ctx.font='bold '+(isMobileControlMode()?'10':'12')+'px Square721BT, Yu Gothic UI, sans-serif';const hint=isMobileControlMode()?'TAP INTERACT':'F : TALK';const hintW=Math.max(72,ctx.measureText(hint).width+14);ctx.fillStyle='#07101a';ctx.fillRect(npc.x-hintW/2,base-92,hintW,16);ctx.strokeStyle='#fcd34d';ctx.strokeRect(npc.x-hintW/2,base-92,hintW,16);ctx.fillStyle='#fef3c7';ctx.fillText(hint,npc.x,base-81);}
         if(!near&&!storyState.flags['met:'+npc.id]){ctx.fillStyle='#fcd34d';ctx.font='bold 15px Square721BT, Yu Gothic UI, sans-serif';ctx.textAlign='center';ctx.fillText('!',npc.x,base-77);}ctx.restore();
     }
 }
@@ -8160,6 +9065,7 @@ const shells = [];
 const bullets = [];
 const weaponProjectiles = []; // 誘導弾・クラスター弾・魔法弾
 const positronEffects = []; // ポジトロン狙撃の極太ビーム・着弾演出
+const longinusEffects = []; // ロンギヌスの槍・単体投擲弾と残光
 const beamMagnumEffects=[]; const electroFlareEffects=[]; const deinosStakeEffects=[]; const archangeEffects=[]; let archangeCharge=0; let archangeWasCharging=false; let archangeBuffUntil=0; let electroFlareTarget=null; let electroFlareAim=null; let electroFlareAimScreen=null;
 const arsenalBits = []; // アーセナルユニットの実体ソードビット
 let positronReloadFx = null; // 砲身冷却・ヒューズ交換の演出状態
@@ -8931,7 +9837,7 @@ function renderShop() {
         + '<aside class="card-section"><div class="card-section-title">SHOP / ショップ</div><div class="card-inline"><span>所持金</span><b>' + cardState.money.toLocaleString('ja-JP') + ' G</b></div>'
         + renderAccessoryShopHTML()
         + '<div class="card-section-title" style="margin-top:14px">WEAPON LICENSES / 新武器</div>'
-        + WEAPONS.filter(w=>w.shopOnly).map(w=>{const owned=isWeaponOwned(w.id),gateLocked=['final_clear','ending_clear'].includes(w.unlockCondition)&&!owned;const cat=w.cat==='melee'?'近接兵装':w.grp==='MAGIC'?'魔法武器':w.grp==='HEAVY'?'重火器':w.grp==='SNIPER'?'狙撃兵装':'特殊兵器';const label=owned?'解禁済み':gateLocked?(w.unlockCondition==='ending_clear'?'エンディング到達で解禁':w.unlockCondition==='stage4_clear'?'ステージ4クリアで解禁':w.unlockCondition==='stage8_clear'?'ステージ8クリアで解禁':w.unlockCondition==='stage12_clear'?'ステージ12クリアで解禁':w.unlockCondition==='stage14_clear'?'ステージ14クリアで解禁':'最終ステージクリアで解禁'):w.cost.toLocaleString('ja-JP')+' G';return '<div class="shop-row"><span>' + w.jp + '<br><span class="card-muted">' + cat + ' · ' + w.desc + '</span></span><button class="card-btn primary" type="button" data-shop-buy="weapon:' + w.id + '"' + (owned||gateLocked||cardState.money<w.cost?' disabled':'') + '>' + label + '</button></div>';}).join('')
+        + WEAPONS.filter(w=>w.shopOnly && (w.id!=='longinus_spear' || !!(storyState?.flags?.final_boss_defeated || storyState?.endings?.includes('final')))).map(w=>{const owned=isWeaponOwned(w.id),gateLocked=(['final_clear','ending_clear','promo_code'].includes(w.unlockCondition)||!!w.unlockCondition)&&!owned;const cat=w.cat==='melee'?'近接兵装':w.grp==='MAGIC'?'魔法武器':w.grp==='HEAVY'?'重火器':w.grp==='SNIPER'?'狙撃兵装':'特殊兵器';const label=owned?'解禁済み':gateLocked?(w.unlockCondition==='promo_code'?'特殊ライセンス / 解放待ち':w.unlockCondition==='ending_clear'?'エンディング到達で解禁':w.unlockCondition==='stage4_clear'?'ステージ4クリアで解禁':w.unlockCondition==='stage8_clear'?'ステージ8クリアで解禁':w.unlockCondition==='stage12_clear'?'ステージ12クリアで解禁':w.unlockCondition==='stage14_clear'?'ステージ14クリアで解禁':'条件達成で解禁'):w.cost.toLocaleString('ja-JP')+' G';return '<div class="shop-row"><span>' + w.jp + '<br><span class="card-muted">' + cat + ' · ' + w.desc + '</span></span><button class="card-btn primary" type="button" data-shop-buy="weapon:' + w.id + '"' + (owned||gateLocked||cardState.money<w.cost?' disabled':'') + '>' + label + '</button></div>';}).join('')
         + '<div class="card-section-title" style="margin-top:14px">ATTACHMENT LICENSES / 新アタッチメント</div>'
         + ATTACHMENTS.filter(a=>a.cost).map(a=>{const owned=attachmentState.owned.includes(a.id);return '<div class="shop-row"><span>' + a.name + '<br><span class="card-muted">' + a.desc + '</span></span><button class="card-btn primary" type="button" data-shop-buy="attachment:' + a.id + '"' + (owned||cardState.money<a.cost?' disabled':'') + '>' + (owned?'購入済み':a.cost.toLocaleString('ja-JP')+' G') + '</button></div>';}).join('')
         + Object.entries(SHOP_PACKS).map(([k, p]) => '<div class="shop-row"><span>' + p.name + '<br><span class="card-muted">ランダムなパーツ ' + p.count + ' 個</span></span><button class="card-btn primary" type="button" data-shop-buy="' + k + '"' + (cardState.money < p.cost ? ' disabled' : '') + '>' + p.cost + ' G</button></div>').join('')
@@ -8952,7 +9858,7 @@ function renderUtilityShop(){
  const money=document.getElementById('shop-money'),content=document.getElementById('shop-content');if(!money||!content)return;money.textContent=(cardState.money||0).toLocaleString('ja-JP')+' G';
  document.querySelectorAll('[data-shop-tab]').forEach(b=>b.classList.toggle('on',b.dataset.shopTab===shopView));
  if(shopView==='weapons'){
-  content.innerHTML='<div class="utility-note">武器ライセンス売り場。ステージクリア報酬武器は該当ステージのクリアでのみ獲得でき、ここでは購入できません。</div><div class="utility-grid">'+WEAPONS.filter(w=>w.shopOnly).map(w=>{const owned=isWeaponOwned(w.id),isStageReward=['stage4_clear','stage8_clear','stage12_clear','stage14_clear'].includes(w.unlockCondition),locked=!!w.unlockCondition&&!owned,price=Number(w.cost)||0;const label=owned?'所持済み':isStageReward?'ステージ報酬':locked?'解放条件あり':price.toLocaleString('ja-JP')+' G';return `<article class="utility-item"><h3 style="color:${w.col}">${w.jp} <span style="font-size:10px;color:#94a3b8">${w.name}</span></h3><p>${w.desc}</p><div class="utility-meta">${w.grp==='MAGIC'?'魔法武器':w.cat==='melee'?'近接兵装':w.grp+' / 特殊兵装'} · ${label}</div><button type="button" data-utility-buy-weapon="${w.id}" ${owned||locked||cardState.money<price?'disabled':''}>${owned?'購入済み':isStageReward?'ステージクリアで獲得':locked?'ロック中':'購入 · '+price.toLocaleString('ja-JP')+' G'}</button></article>`;}).join('')+'</div>';
+  content.innerHTML='<div class="utility-note">武器ライセンス売り場。ステージクリア報酬武器は該当ステージのクリアでのみ獲得でき、ここでは購入できません。</div><div class="utility-grid">'+WEAPONS.filter(w=>w.shopOnly && (w.id!=='longinus_spear' || !!(storyState?.flags?.final_boss_defeated || storyState?.endings?.includes('final')))).map(w=>{const owned=isWeaponOwned(w.id),isStageReward=['stage4_clear','stage8_clear','stage12_clear','stage14_clear'].includes(w.unlockCondition),locked=!!w.unlockCondition&&!owned,price=Number(w.cost)||0;const label=owned?'所持済み':isStageReward?'ステージ報酬':locked?'解放条件あり':price.toLocaleString('ja-JP')+' G';return `<article class="utility-item"><h3 style="color:${w.col}">${w.jp} <span style="font-size:10px;color:#94a3b8">${w.name}</span></h3><p>${w.desc}</p><div class="utility-meta">${w.grp==='MAGIC'?'魔法武器':w.cat==='melee'?'近接兵装':w.grp+' / 特殊兵装'} · ${label}</div><button type="button" data-utility-buy-weapon="${w.id}" ${owned||locked||cardState.money<price?'disabled':''}>${owned?'購入済み':isStageReward?'ステージクリアで獲得':locked?'ロック中':'購入 · '+price.toLocaleString('ja-JP')+' G'}</button></article>`;}).join('')+'</div>';
  }else if(shopView==='attachments'){
   content.innerHTML='<div class="utility-note">購入可能なライセンスはこの売り場に集約。購入後は「アタッチメント」メニューで装着します。</div><div class="utility-grid">'+ATTACHMENTS.filter(a=>a.cost).map(a=>{const owned=attachmentState.owned.includes(a.id);return `<article class="utility-item"><h3 style="color:${a.color}">${a.name}</h3><p>${a.desc}</p><div class="utility-meta">${owned?'所持済み':a.cost.toLocaleString('ja-JP')+' G'}</div><button type="button" data-utility-buy-attachment="${a.id}" ${owned||cardState.money<a.cost?'disabled':''}>${owned?'購入済み':'購入 · '+a.cost.toLocaleString('ja-JP')+' G'}</button></article>`;}).join('')+'</div>';
  }else if(shopView==='accessories'){
@@ -9166,7 +10072,7 @@ document.getElementById('shop-content').addEventListener('click',ev=>{const b=ev
 document.getElementById('accessory-content').addEventListener('click',ev=>{const b=ev.target.closest('[data-accessory-toggle]');if(!b)return;toggleAccessory(b.dataset.accessoryToggle);renderAccessoryLoadout();});
 document.getElementById('items-content').addEventListener('click',ev=>{const b=ev.target.closest('[data-use-item]');if(!b)return;if(useConsumable(b.dataset.useItem))renderItemsInventory();});
 for(const id of ['shop-close','accessory-close','items-close'])document.getElementById(id).addEventListener('click',closeUtilityMenu);
-window.addEventListener('keydown',ev=>{if(ev.code==='KeyU'&&!ev.repeat&&gameStarted&&!paused&&!menuOpen){ev.preventDefault();openUtilityMenu('items');}});
+window.addEventListener('keydown',ev=>{const t=ev.target;if(t&&(t.matches?.('input,textarea,select')||t.isContentEditable||t.closest?.('[contenteditable="true"],[role="textbox"]')))return;if(ev.code==='KeyU'&&!ev.repeat&&gameStarted&&!paused&&!menuOpen){ev.preventDefault();openUtilityMenu('items');}});
 loadCardProgress();
 // 装備済みカードの能力をゲームへ反映（セーブデータ復元後）。
 applyCardLoadout();
@@ -9879,9 +10785,79 @@ function deinosPilebunkerAttack(){
  .to(player,{weapX:8,weapY:3,weapAngle:0,torsoAngle:0,duration:.32,ease:'power2.out'});
 }
 
+// ロンギヌスの槍：近接攻撃と単体投擲。投擲は命中対象1体のみ、ボスには無効。
+function longinusSpearSwing(){
+    if(player.switching||player.actionLock||player.swordCooldown>0)return;
+    const f=player.facing||1, sy=player.y-42, reach=340;
+    player.swordCooldownMax=cd(34);player.swordCooldown=cd(34);player.aiming=false;
+    createSlashEffect(player.x+f*22,sy,f,1,2.65);
+    spawnShockwave(player.x+f*reach*.72,sy,105,7,520);spawnHitSparks(player.x+f*48,sy,28,'#ff243f',1.6,1.3);shakeScreen(9,.22);
+    for(let i=enemies.length-1;i>=0;i--){const e=enemies[i],dx=(e.x-player.x)*f,dy=Math.abs((e.y-32)-sy);if(dx>=-18&&dx<=reach&&dy<=120){damageEnemy(e,1e9,f*24,-11);spawnHitSparks(e.x,e.y-32,24,'#ff243f',1.4,1.4);}}
+    for(let i=destructibles.length-1;i>=0;i--){const c=destructibles[i],dx=(c.x+c.w/2-player.x)*f;if(dx>=-8&&dx<=reach)damageCrate(c,1e9);}
+    for(let i=enemyBullets.length-1;i>=0;i--){const b=enemyBullets[i],dx=(b.x-player.x)*f;if(dx>=-20&&dx<=reach){spawnHitSparks(b.x,b.y,5,'#ff243f');enemyBullets.splice(i,1);}}
+    showGameToast('LANCE OF LONGINUS / DOUBLE HELIX');
+}
+function longinusSpearThrow(){
+    if(player.switching||player.actionLock||player.swordCooldown>0)return;
+    const f=player.facing||1, originX=player.x+f*36, originY=player.y-43;
+    player.swordCooldownMax=cd(78);player.swordCooldown=cd(78);player.aiming=false;
+    // 投擲体そのものをシミュレーション。敵を全走査して即撃破する旧処理は廃止。
+    longinusEffects.push({kind:'spear',x:originX,y:originY,prevX:originX,vx:f*25,f,age:0,life:58,trail:[],impacted:false,length:185});
+    spawnHitSparks(originX,originY,9,'#ff243f',1.0,1.0);
+    showGameToast('LANCE OF LONGINUS / SINGLE TARGET THROW');
+}
+function updateLonginusProjectiles(){
+    for(let i=longinusEffects.length-1;i>=0;i--){
+        const p=longinusEffects[i];
+        if(p.kind!=='spear'){longinusEffects.splice(i,1);continue;}
+        p.age++;
+        if(p.impacted){p.life--;if(p.life<=0)longinusEffects.splice(i,1);continue;}
+        p.prevX=p.x;p.x+=p.vx;p.life--;
+        p.trail.unshift({x:p.x,y:p.y});if(p.trail.length>5)p.trail.length=5;
+        // ダメージ判定はフォーク先端だけ。軸や残光には当たり判定を付けない。
+        const prevTip=p.prevX+p.f*p.length, tipX=p.x+p.f*p.length, tipY=p.y;
+        const pathLeft=Math.min(prevTip,tipX), pathRight=Math.max(prevTip,tipX);
+        let obstacleDistance=Infinity;
+        const considerObstacle=(left,right,top,bottom)=>{
+            if(tipY<top-8||tipY>bottom+8||pathRight<left||pathLeft>right)return;
+            const inside=prevTip>=left&&prevTip<=right;
+            const near=p.f>0?left:right;
+            const dist=inside?0:Math.max(0,(near-prevTip)*p.f);
+            obstacleDistance=Math.min(obstacleDistance,dist);
+        };
+        for(const w of walls)considerObstacle(w.x,w.x+w.w,w.y-w.h,w.y);
+        for(const c of destructibles)considerObstacle(c.x,c.x+c.w,c.y,c.y+c.h);
+        const candidates=enemies.filter(e=>segmentHitsEnemy(prevTip,tipY,tipX,tipY,10,e)).map(e=>{
+            const b=enemyHitbox(e),entry=p.f>0?b.left-10:b.right+10;
+            return {e,dist:Math.max(0,(entry-prevTip)*p.f)};
+        }).sort((a,b)=>a.dist-b.dist);
+        const firstHit=candidates[0];
+        // 壁より手前の敵に当たった場合だけ、その1体を処理する。
+        if(firstHit && firstHit.dist<obstacleDistance){
+            const target=firstHit.e;
+            p.impacted=true;p.life=Math.min(p.life,7);p.x=target.x-p.f*p.length;p.y=target.y-39;
+            if(target.isBoss){
+                // ボスには投擲ダメージを一切与えない。接触時に槍が弾かれる。
+                spawnHitSparks(target.x,target.y-38,16,'#ff243f',1.2,1.1);spawnShockwave(target.x,target.y-32,44,3,220);
+                showGameToast('BOSS IMMUNE / LONGINUS THROW NULLIFIED');
+            }else{
+                damageEnemy(target,480,p.f*11,-5.5);
+                spawnHitSparks(target.x,target.y-32,18,'#ff243f',1.3,1.15);spawnShockwave(target.x,target.y-32,42,3,220);
+                showGameToast('LANCE OF LONGINUS / TARGET HIT');
+            }
+            continue;
+        }
+        if(obstacleDistance<Infinity){
+            p.impacted=true;p.life=Math.min(p.life,5);p.x=prevTip-p.f*p.length;spawnHitSparks(prevTip,tipY,8,'#ff243f');continue;
+        }
+        if(p.life<=0||p.x<-100||p.x>activeStageWidth+100)longinusEffects.splice(i,1);
+    }
+}
+
 // 大剣コンボ攻撃 (Zキー / クールタイム付き)
 function attackSword() {
     if (player.switching || player.actionLock || player.swordCooldown > 0) return;
+    if (player.wid === 'longinus_spear') { longinusSpearSwing(); return; }
     if (player.wid === 'arsenal_unit') { arsenalUnitAttack(); return; }
     if (player.wid === 'deinos_pilebunker') { deinosPilebunkerAttack(); return; }
 
@@ -10650,7 +11626,19 @@ function drawElectroFlareTargetingReticle(){
     ctx.restore();
 }
 function drawSpecialRewardWeaponEffects(){
-    for(let i=archangeEffects.length-1;i>=0;i--){const e=archangeEffects[i];e.life--;if(e.life<=0){archangeEffects.splice(i,1);continue;}ctx.save();ctx.globalAlpha=e.life/e.max;ctx.translate(e.x,e.y);ctx.rotate(e.ang);const L=e.length||150,W=e.width||10;ctx.shadowBlur=22;ctx.shadowColor=e.color;ctx.strokeStyle=e.color;ctx.lineWidth=W;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(L,0);ctx.stroke();ctx.lineWidth=Math.max(1.5,W*.22);ctx.beginPath();ctx.moveTo(0,-W*.72);ctx.lineTo(L,-W*.72);ctx.moveTo(0,W*.72);ctx.lineTo(L,W*.72);ctx.stroke();ctx.restore();}
+  for(let i=longinusEffects.length-1;i>=0;i--){
+    const e=longinusEffects[i];
+    if(e.kind==='spear'){
+      const fade=e.impacted?Math.max(0,e.life/7):1;
+      ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
+      // 赤い残光は視覚演出だけ。残光自体には攻撃判定を持たせない。
+      for(let j=e.trail.length-1;j>=0;j--){const tr=e.trail[j],a=(1-j/e.trail.length)*.22*fade;ctx.globalAlpha=a;ctx.strokeStyle='#ff173d';ctx.shadowColor='#ff123b';ctx.shadowBlur=15;ctx.lineWidth=5-j*.6;ctx.beginPath();ctx.moveTo(tr.x-e.f*20,tr.y);ctx.lineTo(tr.x+e.f*86,tr.y);ctx.stroke();}
+      ctx.globalAlpha=fade;ctx.shadowColor='#ff123b';ctx.shadowBlur=e.impacted?12:20;
+      ctx.translate(e.x,e.y);ctx.scale(e.f,1);ctx.scale(.88,.88);drawLonginusSpearGlyph(190);
+      ctx.restore();continue;
+    }
+  }
+  for(let i=archangeEffects.length-1;i>=0;i--){const e=archangeEffects[i];e.life--;if(e.life<=0){archangeEffects.splice(i,1);continue;}ctx.save();ctx.globalAlpha=e.life/e.max;ctx.translate(e.x,e.y);ctx.rotate(e.ang);const L=e.length||150,W=e.width||10;ctx.shadowBlur=22;ctx.shadowColor=e.color;ctx.strokeStyle=e.color;ctx.lineWidth=W;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(L,0);ctx.stroke();ctx.lineWidth=Math.max(1.5,W*.22);ctx.beginPath();ctx.moveTo(0,-W*.72);ctx.lineTo(L,-W*.72);ctx.moveTo(0,W*.72);ctx.lineTo(L,W*.72);ctx.stroke();ctx.restore();}
 
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';ctx.lineJoin='round';
   for(let i=beamMagnumEffects.length-1;i>=0;i--){const e=beamMagnumEffects[i],a=1-e.age/e.life;ctx.globalAlpha=Math.max(0,a);ctx.strokeStyle='#ff72d2';ctx.lineWidth=66*a+8;ctx.beginPath();ctx.moveTo(e.x1,e.y1);ctx.lineTo(e.x2,e.y2);ctx.stroke();ctx.strokeStyle='#fff7fd';ctx.lineWidth=18*a+2;ctx.beginPath();ctx.moveTo(e.x1,e.y1);ctx.lineTo(e.x2,e.y2);ctx.stroke();ctx.strokeStyle='#f0abfc';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(e.x1,e.y1);ctx.lineTo(e.x2,e.y2);ctx.stroke();if(++e.age>=e.life)beamMagnumEffects.splice(i,1);}
@@ -11076,6 +12064,8 @@ function updateRain() {
 // --- メイン更新ループ ---
 
 function update() {
+    const longinusThrowButton = document.getElementById('muyuu-longinus-throw-button');
+    if (longinusThrowButton) longinusThrowButton.hidden = player.wid !== 'longinus_spear';
     updateStage17SpecialHazards();
     updateShake();
     updateGimmicks();
@@ -11149,7 +12139,7 @@ function update() {
     // 操作可能な状態の処理
     if (!player.actionLock) {
         // 武器切り替え (X または C)
-        if (justPressed.x || (justPressed.c && !(player.wid==='archange' && (keys.z||keys.c)))) {
+        if (justPressed.x || (justPressed.c && player.wid!=='longinus_spear' && !(player.wid==='archange' && (keys.z||keys.c)))) {
             switchWeapon();
         }
         if(player.wid==='archange' && player.weapon==='rifle') {
@@ -11168,9 +12158,8 @@ function update() {
         // 攻撃入力 (Z)
         if (player.weapon === 'sword') {
             player.aiming = false;
-            if (justPressed.z && player.swordCooldown === 0) {
-                attackSword();
-            }
+            if (player.wid === 'longinus_spear' && justPressed.c) longinusSpearThrow();
+            if (justPressed.z && player.swordCooldown === 0) attackSword();
         } else if (player.weapon === 'rifle') {
             if (player.reloading) {
                 player.aiming = false;
@@ -11201,11 +12190,15 @@ function update() {
                 const controlsInverted = (gimmickDef()?.type === 'inversion' || activeStageId === 'final_16') && gimState.invertControls;
                 const moveLeft = controlsInverted ? keys.right : keys.left;
                 const moveRight = controlsInverted ? keys.left : keys.right;
-                if (moveLeft) {
-                    player.vx = Math.max(player.vx - accel, -maxSpeed);
+                const rawStickX = window.__muyuuStickActive ? (Number(window.__muyuuStickAxisX) || 0) : null;
+                const moveAxis = rawStickX !== null ? (controlsInverted ? -rawStickX : rawStickX) : (moveLeft ? -1 : (moveRight ? 1 : 0));
+                if (moveAxis < -0.12) {
+                    const strength = Math.abs(moveAxis);
+                    player.vx = Math.max(player.vx - accel * Math.max(0.25, strength), -maxSpeed * strength);
                     if (!player.aiming) player.facing = -1;
-                } else if (moveRight) {
-                    player.vx = Math.min(player.vx + accel, maxSpeed);
+                } else if (moveAxis > 0.12) {
+                    const strength = Math.abs(moveAxis);
+                    player.vx = Math.min(player.vx + accel * Math.max(0.25, strength), maxSpeed * strength);
                     if (!player.aiming) player.facing = 1;
                 } else {
                     player.vx *= player.grounded ? 0.75 : 0.92;
@@ -11389,6 +12382,7 @@ function update() {
 
     // 敵・雨・骨格ポーズの更新
     updateEnemies();
+    updateLonginusProjectiles();
     updateWeaponProjectiles();
     updateArsenalBits();
     updateBossHUD();
@@ -12856,7 +13850,90 @@ requestAnimationFrame(loop);
     if (!root || root.dataset.inputBound === 'true') return;
     root.dataset.inputBound = 'true';
 
-    const mapping = {left:'left',right:'right',up:'up',down:'down',z:'z',x:'x',e:'e',shift:'shift',f:'f',i:'i',escape:'escape'};
+    // Analog virtual joystick: it feeds the same game input state as the keyboard.
+    const stick = document.getElementById('muyuu-virtual-stick');
+    const knob = document.getElementById('muyuu-virtual-stick-knob');
+    let stickPointerId = null;
+    let stickAxisX = 0;
+    let stickAxisY = 0;
+    window.__muyuuStickActive = false;
+    window.__muyuuStickAxisX = 0;
+    window.__muyuuStickAxisY = 0;
+    function setStickAxes(x, y) {
+      const wasUp = !!(window.keys && window.keys.up);
+      stickAxisX = Math.max(-1, Math.min(1, x));
+      stickAxisY = Math.max(-1, Math.min(1, y));
+      window.__muyuuStickAxisX = stickAxisX;
+      window.__muyuuStickAxisY = stickAxisY;
+      window.__muyuuStickActive = stickPointerId !== null;
+      if (!window.keys) return;
+      // Left/right are thresholded for game systems (e.g. boost and double tap),
+      // while normal walking uses the continuous X axis for variable speed.
+      window.keys.left = stickAxisX < -0.22;
+      window.keys.right = stickAxisX > 0.22;
+      const downNow = stickAxisY > 0.68;
+      const upNow = stickAxisY < -0.68;
+      window.keys.down = downNow;
+      window.keys.up = upNow;
+      if (upNow && !wasUp && window.justPressed) window.justPressed.up = true;
+    }
+    function resetStick() {
+      stickPointerId = null;
+      stickAxisX = 0; stickAxisY = 0;
+      window.__muyuuStickAxisX = 0; window.__muyuuStickAxisY = 0;
+      window.__muyuuStickActive = false;
+      if (window.keys) { window.keys.left = false; window.keys.right = false; window.keys.down = false; window.keys.up = false; }
+      if (knob) knob.style.transform = 'translate(-50%, -50%)';
+      if (stick) stick.classList.remove('is-active');
+    }
+    function moveStick(clientX, clientY, event) {
+      if (!stick || stickPointerId === null) return;
+      if (event && event.cancelable) event.preventDefault();
+      const base = stick.querySelector('.muyuu-stick-base');
+      if (!base) return;
+      const rect = base.getBoundingClientRect();
+      const radius = Math.max(20, Math.min(rect.width, rect.height) * 0.33);
+      let dx = clientX - (rect.left + rect.width / 2);
+      let dy = clientY - (rect.top + rect.height / 2);
+      const len = Math.hypot(dx, dy);
+      if (len > radius) { dx = dx / len * radius; dy = dy / len * radius; }
+      const x = dx / radius, y = dy / radius;
+      if (knob) knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      setStickAxes(x, y);
+    }
+    if (stick && knob) {
+      stick.addEventListener('contextmenu', e => { if (e.cancelable) e.preventDefault(); }, {passive:false});
+      stick.addEventListener('selectstart', e => { if (e.cancelable) e.preventDefault(); }, {passive:false});
+      if (window.PointerEvent) {
+        stick.addEventListener('pointerdown', e => {
+          if (e.button !== undefined && e.button !== 0) return;
+          if (stickPointerId !== null) return;
+          if (e.cancelable) e.preventDefault();
+          stickPointerId = e.pointerId;
+          stick.classList.add('is-active');
+          try { stick.setPointerCapture(e.pointerId); } catch (_) {}
+          moveStick(e.clientX, e.clientY, e);
+        }, {passive:false});
+        stick.addEventListener('pointermove', e => { if (e.pointerId === stickPointerId) moveStick(e.clientX, e.clientY, e); }, {passive:false});
+        ['pointerup','pointercancel','lostpointercapture'].forEach(type => stick.addEventListener(type, e => { if (stickPointerId !== null && (e.pointerId === undefined || e.pointerId === stickPointerId)) resetStick(); }, {passive:false}));
+      } else {
+        stick.addEventListener('touchstart', e => {
+          if (stickPointerId !== null || !e.changedTouches.length) return;
+          if (e.cancelable) e.preventDefault();
+          stickPointerId = e.changedTouches[0].identifier;
+          stick.classList.add('is-active');
+          moveStick(e.changedTouches[0].clientX, e.changedTouches[0].clientY, e);
+        }, {passive:false});
+        stick.addEventListener('touchmove', e => {
+          for (const t of e.changedTouches) if (t.identifier === stickPointerId) moveStick(t.clientX, t.clientY, e);
+        }, {passive:false});
+        ['touchend','touchcancel'].forEach(type => stick.addEventListener(type, e => {
+          for (const t of e.changedTouches) if (t.identifier === stickPointerId) resetStick();
+        }, {passive:false}));
+      }
+    }
+
+    const mapping = {left:'left',right:'right',up:'up',down:'down',z:'z',x:'x',c:'c',e:'e',r:'r',shift:'shift',f:'f',i:'i',escape:'escape'};
     const held = new Map();
     function press(name, on) {
       // UI actions (NPC / card / inventory / pause) must work even if the gameplay key map is not ready yet.
@@ -12969,7 +14046,8 @@ requestAnimationFrame(loop);
     if (window.ResizeObserver && hud) new ResizeObserver(placePause).observe(hud);
     window.addEventListener('blur', () => {
       root.querySelectorAll('[data-hold], [data-tap]').forEach(btn => up(btn));
-      ['left','right','up','down','z','x','c'].forEach(key => { if (window.keys) window.keys[key] = false; });
+      resetStick();
+      ['left','right','up','down','z','x','c','shift'].forEach(key => { if (window.keys) window.keys[key] = false; });
     });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initTouchControls, {once:true});
@@ -13092,6 +14170,7 @@ requestAnimationFrame(loop);
     if (platformSelect) platformSelect.value = options.platformMode;
     const hint = document.getElementById('muyuu-options-status');
     if (hint) hint.textContent = mode === 'mobile' ? 'スマホ操作モード：画面上のボタンで移動・攻撃できます。' : 'PC操作モード：キーボードで操作します。';
+    if (typeof window.MUYUU_updateControlModeHints === 'function') window.MUYUU_updateControlModeHints();
   }
   function effectivePreset() { return options.preset === 'auto' ? getAutoPreset() : options.preset; }
   function save() {
@@ -13104,8 +14183,15 @@ requestAnimationFrame(loop);
   function setMusicVolume(value) {
     options.musicVolume = Math.max(0, Math.min(1, Number(value)));
     try {
+      if (typeof MUSIC_TARGET_VOLUME !== 'undefined') MUSIC_TARGET_VOLUME = options.musicVolume;
       if (typeof MUSIC_TRACKS !== 'undefined') {
-        for (const track of Object.values(MUSIC_TRACKS)) track.volume = options.musicVolume;
+        const activeKey = typeof currentMusicKey !== 'undefined' ? currentMusicKey : null;
+        for (const [key, track] of Object.entries(MUSIC_TRACKS)) {
+          if (key === activeKey && !track.paused && typeof rampMusicVolume === 'function' && !openingMovieActive && !cinematicAudioMuted) {
+            rampMusicVolume(track, options.musicVolume, 240);
+          } else if (track.paused) track.volume = options.musicVolume;
+          // An inactive, playing track may be fading out; leave its ramp alone.
+        }
       }
     } catch (_) {}
     $('muyuu-bgm-label').textContent = `${Math.round(options.musicVolume * 100)}%`;
@@ -13268,12 +14354,17 @@ html[data-control-mode="mobile"] body{overscroll-behavior:none}
 @media(max-height:430px){.touch-cluster{gap:5px}.touch-move{grid-template-rows:repeat(2,58px)}.touch-actions{grid-auto-rows:54px}#muyuu-touch-controls button{min-height:54px;border-radius:12px}#muyuu-mobile-pause{height:50px;width:68px}}
 </style>
 <div id="muyuu-touch-controls" aria-label="スマホ操作" aria-hidden="true">
-  <div class="touch-cluster touch-move"><button data-hold="left" aria-label="左へ">◀ LEFT</button><button data-hold="right" aria-label="右へ">RIGHT ▶</button><button data-hold="down" aria-label="下へ・足場を降りる">▼ DOWN</button></div>
+  <div class="touch-cluster touch-move" aria-label="移動スティック">
+    <div id="muyuu-virtual-stick" role="application" aria-label="移動スティック。スライドして移動、上でジャンプ、下で足場を降りる" tabindex="0">
+      <div class="muyuu-stick-base"><div class="muyuu-stick-ring"></div><div id="muyuu-virtual-stick-knob" class="muyuu-stick-knob"></div></div>
+      <span class="muyuu-stick-label">MOVE</span>
+    </div>
+  </div>
   <div class="touch-cluster touch-actions">
-    <button data-hold="up" aria-label="ジャンプ">JUMP ▲</button><button data-hold="z" aria-label="攻撃">ATTACK</button>
-    <button data-hold="shift" aria-label="通常ブースト">BOOST</button><button data-tap="e" aria-label="次の武器へ切り替え">CHANGE ⇥</button>
-    <button data-tap="f" aria-label="会話・調べる">INTERACT</button><button data-tap="k" aria-label="カード編成">CARD</button>
-    <button data-tap="i" aria-label="インベントリ">BAG</button><button data-hold="charge" aria-label="Archangeチャージ" id="muyuu-charge-button" hidden>CHARGE</button>
+    <button data-hold="up" aria-label="ジャンプ">JUMP ▲</button><button data-hold="z" aria-label="攻撃">ATTACK</button><button data-hold="shift" class="touch-boost" aria-label="通常ブースト">BOOST</button><button data-hold="c" id="muyuu-longinus-throw-button" aria-label="ロンギヌスの槍を投擲" hidden>THROW</button>
+    <button data-tap="e" aria-label="次の武器へ切り替え">CHANGE ⇥</button><button data-tap="r" aria-label="リロード">RELOAD</button><button data-tap="f" aria-label="会話・調べる">INTERACT</button>
+    <button data-tap="k" aria-label="カード編成">CARD</button><button data-tap="i" aria-label="インベントリ">BAG</button>
+    <button data-hold="charge" aria-label="Archangeチャージ" id="muyuu-charge-button" hidden>CHARGE</button>
     <button data-tap="escape" aria-label="ポーズ" id="muyuu-mobile-pause">Ⅱ PAUSE</button>
   </div>
 </div>
@@ -13410,6 +14501,142 @@ button,select,a,[role="button"]{touch-action:manipulation;-webkit-tap-highlight-
 </script>
 <div id="muyuu-glitch-overlay" aria-hidden="true"><div class="glitch-noise"></div><div class="glitch-scanlines"></div><div class="glitch-vignette"></div><div class="glitch-flash"></div><div class="glitch-terminal"><div class="glitch-brand">MUYUU / CAUSALITY MONITOR <span>NO.00</span></div><div class="glitch-line"></div><div class="glitch-log"></div><div class="glitch-footer">DO NOT POWER OFF · MEMORY SECTOR 0x00</div></div></div>
 <div id="muyuu-credits-overlay" class="hidden"><div class="credits-roll">MUYUU // FINAL RECORD<br>PROJECT COMPLETE<br><br>FIELD OPERATIONS — CLOSED<br>ARCHANGE LICENSE — GRANTED<br>SOLAR FURNACE — GRANTED</div><div class="credits-thanks">ここまでプレイしていただきありがとうございました！</div></div>
+<!-- MUYUU CREDITS MENU: full production credits, separate from the story-ending roll. -->
+<div id="muyuu-credits-menu" class="muyuu-credits-menu hidden" role="dialog" aria-modal="true" aria-labelledby="credits-menu-title">
+  <div class="credits-shell">
+    <header class="credits-topbar">
+      <div class="credits-brand-block">
+        <div class="credits-eyebrow">PROJECT MUYUU</div>
+        <h1 id="credits-menu-title">CREDIT<span>Metalepsis_ 2D ACTION GAME</span></h1>
+      </div>
+      <button id="credits-menu-close" class="credits-close" type="button" aria-label="Close credits">CLOSE <span>[ ESC ]</span></button>
+    </header>
+    <div class="credits-layout">
+      <nav class="credits-nav" aria-label="Credits sections">
+        <div class="credits-nav-label">INDEX / 目次</div>
+        <button type="button" class="credit-nav-btn active" data-credit-target="credit-author">01 <span>AUTHOR</span></button>
+        <button type="button" class="credit-nav-btn" data-credit-target="credit-problem">02 <span>STORY EDITER</span></button>
+        <button type="button" class="credit-nav-btn" data-credit-target="credit-support">03 <span>PRODUCTION SUPPORT</span></button>
+        <button type="button" class="credit-nav-btn" data-credit-target="credit-concept">04 <span>ORIGINAL CONCEPT</span></button>
+        <button type="button" class="credit-nav-btn" data-credit-target="credit-bgm">05 <span>BGM</span></button>
+        <button type="button" class="credit-nav-btn" data-credit-target="credit-thanks">06 <span>SPECIAL THANKS</span></button>
+        <button type="button" class="credit-nav-btn" data-credit-target="credit-community">07 <span>AND YOU / END</span></button>
+        <div class="credits-nav-foot">RECORD STATUS<br><b>ACKNOWLEDGED</b></div>
+      </nav>
+      <main id="credits-content" class="credits-content" tabindex="0">
+        <section class="credit-section credit-lead" id="credit-author">
+          <div class="credit-section-no">01 / CREATOR</div>
+          <h2>AUTHOR</h2>
+          <div class="credit-feature-name">Metalepsis_ <a class="credit-handle" href="https://twitter.com/Metalepsis_jp" target="_blank" rel="noopener noreferrer">(@Metalepsis_jp)</a></div>
+        </section>
+        <section class="credit-section" id="credit-problem">
+          <div class="credit-section-no">02 / DOCUMENTATION</div>
+          <h2>STORY EDITER</h2>
+          <div class="credit-name-card">Metalepsis_ <a class="credit-handle" href="https://twitter.com/Metalepsis_jp" target="_blank" rel="noopener noreferrer">(@Metalepsis_jp)</a></div>
+        </section>
+        <section class="credit-section" id="credit-support">
+          <div class="credit-section-no">03 / COLLABORATION</div>
+          <h2>PRODUCTION SUPPORT</h2>
+          <div class="credit-name-grid credit-name-grid-3">
+            <div class="credit-name-card">Claude</div>
+            <div class="credit-name-card">ChatGPT</div>
+            <div class="credit-name-card">Gemini</div>
+          </div>
+        </section>
+        <section class="credit-section" id="credit-concept">
+          <div class="credit-section-no">04 / ORIGIN</div>
+          <h2>ORIGINAL CONCEPT BY</h2>
+          <div class="credit-feature-name credit-concept-names">
+            <span class="credit-person">Metalepsis_ <a class="credit-handle" href="https://twitter.com/Metalepsis_jp" target="_blank" rel="noopener noreferrer">(@Metalepsis_jp)</a></span>
+            <span class="credit-person">ぴの👻🦋 <a class="credit-handle" href="https://twitter.com/pino3296" target="_blank" rel="noopener noreferrer">(@pino3296)</a></span>
+          </div>
+        </section>
+        <section class="credit-section" id="credit-bgm">
+          <div class="credit-section-no">05 / SOUNDTRACK</div>
+          <h2>BGM</h2>
+          <ol class="credit-track-list">
+            <li><span>01</span><div>Metalepsis_(SUNO AI) <b>- MENU</b></div></li>
+            <li><span>02</span><div>Metalepsis_(SUNO AI) <b>- PillaR</b></div></li>
+            <li><span>03</span><div>Creo <b>- Restless</b></div></li>
+            <li><span>04</span><div>まんぼう二等兵(Opentracks) <b>- プラネタリウムガーデン</b></div></li>
+            <li><span>05</span><div>Nitro Fun <b>- FINAL BOSS</b></div></li>
+            <li><span>06</span><div>CrimzonWolf777 <b>- Fear Factory 2009</b></div></li>
+          </ol>
+          <div class="credit-lock-notice" id="credit-bgm-stage17-lock"><b>SEALED SOUNDTRACK / STAGE 17</b><span>以下の楽曲はステージ17クリア後に解放されます。</span></div>
+          <ol class="credit-track-list credit-track-list-locked hidden" id="credit-bgm-stage17-tracks" start="7">
+            <li><span>07</span><div>FREE99 <b>- OXYGEN</b></div></li>
+            <li><span>08</span><div>nons works <b>- 絶望から見い出した希望</b></div></li>
+            <li><span>09</span><div>rl1805 <b>- blue feat. rollin9girl</b></div></li>
+            <li><span>10</span><div>Dunderpatrullen <b>- Singlarity</b></div></li>
+          </ol>
+        </section>
+        <section class="credit-section" id="credit-thanks">
+          <div class="credit-section-no">06 / APPRECIATION</div>
+          <h2>SPECIAL THANKS</h2>
+          <div class="credit-name-grid">
+            <div class="credit-name-card">桜宮 凪<span>(<a class="credit-handle" href="https://twitter.com/sakumiya3938" target="_blank" rel="noopener noreferrer">@sakumiya3938</a>)</span></div>
+            <div class="credit-name-card">TR𝙰𝙸TOR? (배신자)@就活中？ <span>(<a class="credit-handle" href="https://twitter.com/Traitor_BEMANI" target="_blank" rel="noopener noreferrer">@Traitor_BEMANI</a>)</span></div>
+            <div class="credit-name-card">猫谷みぃた(強いマン,始末マン) <span>(<a class="credit-handle" href="https://twitter.com/nekoya_mita" target="_blank" rel="noopener noreferrer">@nekoya_mita</a>)</span></div>
+            <div class="credit-name-card">蜜柑せ🍊 <span>(<a class="credit-handle" href="https://twitter.com/orange_kotama_" target="_blank" rel="noopener noreferrer">@orange_kotama_</a>)</span></div>
+            <div class="credit-name-card">zero <span>(<a class="credit-handle" href="https://twitter.com/zero381190" target="_blank" rel="noopener noreferrer">@zero381190</a>)</span></div>
+            <div class="credit-name-card">霧時雨 <span>(<a class="credit-handle" href="https://twitter.com/mist_rein96c" target="_blank" rel="noopener noreferrer">@mist_rein96c</a>)</span></div>
+            <div class="credit-name-card">レティ・エル＝パスカルナノ嬢 <span>(<a class="credit-handle" href="https://twitter.com/LettieWhiterock" target="_blank" rel="noopener noreferrer">@LettieWhiterock</a>)</span></div>
+            <div class="credit-name-card">Sato <span>(<a class="credit-handle" href="https://twitter.com/sato27535" target="_blank" rel="noopener noreferrer">@sato27535</a>)</span></div>
+            <div class="credit-name-card">神夜聖一郎(yunesss&amp;Respect) <span>(<a class="credit-handle" href="https://twitter.com/yunesss_Respect" target="_blank" rel="noopener noreferrer">@yunesss_Respect</a>)</span></div>
+            <div class="credit-name-card">おこじょきんぐ <span>(<a class="credit-handle" href="https://twitter.com/0kojme1me" target="_blank" rel="noopener noreferrer">@0kojme1me</a>)</span></div>
+            <div class="credit-name-card">icey <span>(<a class="credit-handle" href="https://twitter.com/icey_1220" target="_blank" rel="noopener noreferrer">@icey_1220</a>)</span></div>
+            <div class="credit-name-card">PC Vre16.6 <span>(<a class="credit-handle" href="https://twitter.com/PC_Ver16_6" target="_blank" rel="noopener noreferrer">@PC_Ver16_6</a>)</span></div>
+            <div class="credit-name-card">えびカツどん <span>(<a class="credit-handle" href="https://twitter.com/GWYX7zo1wA77415" target="_blank" rel="noopener noreferrer">@GWYX7zo1wA77415</a>)</span></div>
+            <div class="credit-name-card">yukkri namake <span>(<a class="credit-handle" href="https://twitter.com/yukkrinamake" target="_blank" rel="noopener noreferrer">@yukkrinamake</a>)</span></div>
+            <div class="credit-name-card">ざうるす/NC専 <span>(<a class="credit-handle" href="https://twitter.com/fooooooob1234" target="_blank" rel="noopener noreferrer">@fooooooob1234</a>)</span></div>
+            <div class="credit-name-card">MMRB指揮官 <span>(<a class="credit-handle" href="https://twitter.com/MMRBSKKN" target="_blank" rel="noopener noreferrer">@MMRBSKKN</a>)</span></div>
+            <div class="credit-name-card">マーシュ <span>(<a class="credit-handle" href="https://twitter.com/marsh_some" target="_blank" rel="noopener noreferrer">@marsh_some</a>)</span></div>
+            <div class="credit-name-card">saki. <span>(<a class="credit-handle" href="https://twitter.com/saki28509" target="_blank" rel="noopener noreferrer">@saki28509</a>)</span></div>
+            <div class="credit-name-card">Hokori _VRC <span>(<a class="credit-handle" href="https://twitter.com/hokorinokotyann" target="_blank" rel="noopener noreferrer">@hokorinokotyann</a>)</span></div>
+            <div class="credit-name-card">Crayfish <span>(<a class="credit-handle" href="https://twitter.com/lXqGCaUfgH73677" target="_blank" rel="noopener noreferrer">@lXqGCaUfgH73677</a>)</span></div>
+            <div class="credit-name-card">るぁずべりー（ﾋﾟ稲） <span>(<a class="credit-handle" href="https://twitter.com/3txw5w" target="_blank" rel="noopener noreferrer">@3txw5w</a>)</span></div>
+            <div class="credit-name-card">名無しちゃん‎🤍🩹‎💙 <span>(<a class="credit-handle" href="https://twitter.com/qsvoicntnzkgs9" target="_blank" rel="noopener noreferrer">@qsvoicntnzkgs9</a>)</span></div>
+            <div class="credit-name-card">み <span>(<a class="credit-handle" href="https://twitter.com/yoridorimidoriP" target="_blank" rel="noopener noreferrer">@yoridorimidoriP</a>)</span></div>
+            <div class="credit-name-card">迷える子羊（非公式） <span>(<a class="credit-handle" href="https://twitter.com/kyusai_nehan" target="_blank" rel="noopener noreferrer">@kyusai_nehan</a>)</span></div>
+            <div class="credit-name-card">定時退社ごーなうす <span>(<a class="credit-handle" href="https://twitter.com/Goooooonausu" target="_blank" rel="noopener noreferrer">@Goooooonausu</a>)</span></div>
+            <div class="credit-name-card">毬藻煮込み <span>(<a class="credit-handle" href="https://twitter.com/FlyingNeguse" target="_blank" rel="noopener noreferrer">@FlyingNeguse</a>)</span></div>
+            <div class="credit-name-card">しらす <span>(<a class="credit-handle" href="https://twitter.com/shirasu_dankagu" target="_blank" rel="noopener noreferrer">@shirasu_dankagu</a>)</span></div>
+            <div class="credit-name-card">MiZ <span>(<a class="credit-handle" href="https://twitter.com/01satousaikou" target="_blank" rel="noopener noreferrer">@01satousaikou</a>)</span></div>
+            <div class="credit-name-card">ゆっさー🍭🍁 <span>(<a class="credit-handle" href="https://twitter.com/spl_yskun25" target="_blank" rel="noopener noreferrer">@spl_yskun25</a>)</span></div>
+            <div class="credit-name-card">ドラゴンくん <span>(<a class="credit-handle" href="https://twitter.com/Doragonkun1031" target="_blank" rel="noopener noreferrer">@Doragonkun1031</a>)</span></div>
+            <div class="credit-name-card">🍒 <span>(<a class="credit-handle" href="https://twitter.com/8wfsyt" target="_blank" rel="noopener noreferrer">@8wfsyt</a>)</span></div>
+            <div class="credit-name-card">メンダ5 <span>(<a class="credit-handle" href="https://twitter.com/8lpdkbw9wyIfRZH" target="_blank" rel="noopener noreferrer">@8lpdkbw9wyIfRZH</a>)</span></div>
+            <div class="credit-name-card">Gboard クリップボードへようこそ。コピーしたテキストはここに保存されます。クリップを <span>(<a class="credit-handle" href="https://twitter.com/startarstart" target="_blank" rel="noopener noreferrer">@startarstart</a>)</span></div>
+          </div>
+        </section>
+        <section class="credit-section credit-community" id="credit-community">
+          <div class="credit-lock-notice" id="credit-stage16-lock"><b>END RECORD / SEALED</b><span>このセクションはステージ16クリア後に解放されます。</span></div>
+          <div id="credit-stage16-reveal" class="hidden">
+            <div class="credit-section-no">07 / POST-GAME</div>
+            <h2>AND YOU.</h2>
+            <div class="credit-community-list">
+              <div>All Metalepsis_ Follower</div>
+              <div>All Mtps Diagnosis Player</div>
+              <div>All Mtps Ω Field Player</div>
+              <div>All MUYUU Player</div>
+            </div>
+            <div class="credit-you">And <strong>YOU.</strong></div>
+            <p class="credit-thank-you">Thank you for Playing!</p>
+            <div class="credit-project-end">Project MUYUU END.</div>
+
+            <section class="credit-message-block" aria-labelledby="credit-creator-message-title">
+              <div class="credit-section-no">A MESSAGE FROM THE CREATOR</div>
+              <h3 id="credit-creator-message-title">制作者からのメッセージ</h3>
+              <p>MUYUUをプレイしていただきありがとうございます。<br>どうでしたか？楽しめたでしょうか。<br>楽しんでいただけたら幸いです。<br>今後もアップデートし続けますので、気が向いたらぜひ遊びに来てくださいね。<br>それでは、またお会いしましょう…</p>
+            </section>
+</div>
+        </section>
+        <footer class="credits-content-footer">MUYUU // CREDITS ARCHIVE <span>END OF RECORD · 0x00</span></footer>
+      </main>
+    </div>
+  </div>
+</div>
+
 
 
 <style id="muyuu-mobile-zoom-guard">
@@ -13501,5 +14728,542 @@ html[data-control-mode="mobile"] .touch-actions { grid-template-rows: repeat(4,m
 html[data-control-mode="mobile"] .touch-actions button[data-tap="escape"] { grid-column: 1 / -1; width: min(88px,100%); justify-self: center; }
 </style>
 
+
+<style id="muyuu-v44-virtual-joystick">
+/* v44+: analog slide stick on the left; BOOST and action buttons stay on the right. */
+html[data-control-mode="mobile"] #muyuu-touch-controls {
+  align-items:flex-end;
+  gap:clamp(8px,2vw,22px);
+  padding-left:max(10px,env(safe-area-inset-left));
+  padding-right:max(10px,env(safe-area-inset-right));
+}
+html[data-control-mode="mobile"] .touch-move {
+  display:flex;
+  flex-direction:row;
+  align-items:flex-end;
+  justify-content:flex-start;
+  gap:clamp(7px,1.5vw,15px);
+  grid-template-columns:none;
+  grid-template-rows:none;
+  flex:0 1 auto;
+}
+#muyuu-virtual-stick {
+  position:relative;
+  width:clamp(106px,18vw,148px);
+  height:clamp(106px,18vw,148px);
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  pointer-events:auto;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+  outline:none;
+}
+.muyuu-stick-base {
+  position:absolute;
+  inset:4%;
+  border-radius:50%;
+  border:2px solid rgba(125,211,252,.72);
+  background:radial-gradient(circle at 50% 45%,rgba(18,54,78,.78),rgba(4,13,27,.88) 68%);
+  box-shadow:0 4px 18px #0009,inset 0 0 22px #38bdf833,0 0 18px #38bdf81a;
+  pointer-events:none;
+}
+.muyuu-stick-ring {
+  position:absolute;
+  inset:18%;
+  border:1px dashed rgba(125,211,252,.35);
+  border-radius:50%;
+}
+.muyuu-stick-ring::before,.muyuu-stick-ring::after {
+  content:""; position:absolute; background:rgba(125,211,252,.2);
+}
+.muyuu-stick-ring::before { width:1px; top:-20%; bottom:-20%; left:50%; }
+.muyuu-stick-ring::after { height:1px; left:-20%; right:-20%; top:50%; }
+.muyuu-stick-knob {
+  position:absolute;
+  left:50%; top:50%;
+  width:42%; height:42%;
+  border-radius:50%;
+  border:2px solid rgba(224,247,255,.92);
+  background:linear-gradient(145deg,rgba(56,189,248,.93),rgba(8,47,73,.96));
+  box-shadow:0 3px 12px #0009,inset 0 0 15px #e0f2fe4d,0 0 12px #38bdf855;
+  transform:translate(-50%,-50%);
+  transition:background .08s,border-color .08s;
+  pointer-events:none;
+}
+#muyuu-virtual-stick.is-active .muyuu-stick-knob { background:linear-gradient(145deg,#e0f2fe,#0284c7); border-color:#fff; }
+.muyuu-stick-label {
+  position:absolute; bottom:8%; left:0; right:0; text-align:center;
+  color:#c5eafa; font:800 9px/1 system-ui,sans-serif; letter-spacing:.18em;
+  text-shadow:0 1px 4px #000; pointer-events:none;
+}
+/* BOOST now belongs to the right-hand action cluster, so it can be pressed with the right thumb while the left thumb steers. */
+#muyuu-touch-controls button.touch-boost {
+  width:auto;
+  min-width:0;
+  min-height:58px;
+  margin:0;
+  padding:7px 5px;
+  color:#ffe9b0;
+  border-color:rgba(251,191,36,.9);
+  background:linear-gradient(155deg,rgba(74,48,10,.96),rgba(21,20,23,.96));
+  box-shadow:0 4px 14px #0009,inset 0 0 16px #f59e0b22,0 0 12px #f59e0b22;
+  grid-column:auto;
+  touch-action:none;
+}
+#muyuu-touch-controls button.touch-boost.active,
+#muyuu-touch-controls button.touch-boost:active { background:rgba(217,119,6,.96); border-color:#fff1bf; box-shadow:0 0 18px #f59e0b66; }
+html[data-control-mode="mobile"] .touch-actions {
+  grid-template-columns:repeat(2,clamp(66px,9vw,102px));
+  grid-auto-rows:clamp(48px,10vh,70px);
+  gap:clamp(5px,1vw,9px);
+}
+html[data-control-mode="mobile"] .touch-actions button { min-height:48px; padding:6px 4px; font-size:clamp(10px,1.65vw,14px); }
+html[data-control-mode="mobile"] .touch-actions button[hidden] { display:none!important; }
+@media(max-height:430px) {
+  #muyuu-virtual-stick { width:clamp(98px,14vw,122px); height:clamp(98px,14vw,122px); }
+  #muyuu-touch-controls button.touch-boost { min-height:42px; padding:5px 4px; }
+  html[data-control-mode="mobile"] .touch-actions { grid-auto-rows:clamp(42px,11vh,54px); }
+  html[data-control-mode="mobile"] .touch-actions button { min-height:42px; }
+}
+@media (orientation:portrait) and (max-width:900px) {
+  /* Landscape remains the supported play mode; orientation gate already asks user to rotate. */
+  #muyuu-virtual-stick { width:108px; height:108px; }
+}
+</style>
+
+<!-- MUYUU v47: editable-field keyboard guard, hidden pre-endgame promotion content, extra Special Thanks entries. -->
+
+<style id="muyuu-v51-clear-result-style">
+#muyuu-clear-result[hidden]{display:none!important}
+#muyuu-clear-result{position:fixed;inset:0;z-index:1000100;display:flex;align-items:center;justify-content:center;padding:clamp(8px,2vw,24px);background:rgba(1,4,10,.985);color:#e9f7ff;font-family:'LINE Seed JP','Square721BT','Segoe UI',sans-serif;overflow:auto;overscroll-behavior:contain}
+#muyuu-clear-result .mcr-shell{width:min(1240px,100%);max-height:100%;overflow:auto;border:1px solid rgba(87,215,255,.45);background:linear-gradient(150deg,#07121f,#03070d 70%);box-shadow:0 0 70px rgba(0,196,255,.08);}
+#muyuu-clear-result .mcr-header{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:18px 22px;border-bottom:1px solid rgba(98,211,242,.22);color:#77dff8;font:12px 'Square721BT','Consolas',monospace;letter-spacing:.12em}
+#muyuu-clear-result .mcr-layout{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.2fr);gap:22px;padding:clamp(14px,2.2vw,28px)}
+#muyuu-clear-result .mcr-panel{min-width:0;border:1px solid rgba(117,172,203,.22);background:rgba(7,17,29,.72);padding:clamp(16px,2vw,24px)}
+#muyuu-clear-result .mcr-kicker{font:11px 'Square721BT','Consolas',monospace;letter-spacing:.2em;color:#62dff8}
+#muyuu-clear-result h1{font:clamp(27px,4vw,42px)/1.12 'Square721BT','LINE Seed JP',sans-serif;letter-spacing:.045em;color:#fff;margin:14px 0 12px}
+#muyuu-clear-result p{font-size:13px;line-height:1.8;color:#9fb8c8}
+#muyuu-clear-result label{display:block;font-size:12px;color:#c8e3ef;margin:20px 0 8px}
+#muyuu-clear-result input{display:block;width:100%;box-sizing:border-box;height:52px;padding:0 13px;background:#020811;border:1px solid #32728b;color:#fff;font:16px 'LINE Seed JP','Yu Gothic UI',sans-serif;outline:none}
+#muyuu-clear-result input:focus{border-color:#62e7ff;box-shadow:0 0 0 2px rgba(98,231,255,.13)}
+#muyuu-clear-result .mcr-counter{margin-top:6px;text-align:right;color:#5e8297;font:11px 'Square721BT','Consolas',monospace}
+#muyuu-clear-result .mcr-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+#muyuu-clear-result button{min-height:44px;padding:10px 14px;border:1px solid rgba(97,223,255,.42);background:#0b2232;color:#dcf8ff;font:12px 'Square721BT','LINE Seed JP',sans-serif;letter-spacing:.035em;cursor:pointer}
+#muyuu-clear-result button.primary{background:#45d8f5;border-color:#45d8f5;color:#04111a;font-weight:bold}
+#muyuu-clear-result button:disabled{opacity:.36;cursor:not-allowed}
+#muyuu-clear-result .mcr-status{min-height:48px;margin:14px 0 0;color:#9ac5d8;font-size:12px;overflow-wrap:anywhere}
+#muyuu-clear-result .mcr-preview{display:flex;flex-direction:column;min-width:0}
+#muyuu-clear-result .mcr-preview-title{display:flex;justify-content:space-between;gap:12px;padding:0 0 12px;color:#b5d7e6;font:11px 'Square721BT','Consolas',monospace;letter-spacing:.1em}
+#muyuu-clear-result #mcr-result-canvas{display:block;width:100%;height:auto;max-height:58vh;object-fit:contain;object-position:top;background:#030711;border:1px solid rgba(120,205,231,.2)}
+#muyuu-clear-result .mcr-preview-empty{min-height:340px;display:flex;align-items:center;justify-content:center;text-align:center;padding:22px;border:1px dashed rgba(102,196,225,.24);color:#557b91;font:12px/2 'Square721BT','LINE Seed JP',monospace}
+#muyuu-clear-result #mcr-result-canvas[hidden],#muyuu-clear-result .mcr-preview-empty[hidden]{display:none!important}
+#muyuu-clear-result .mcr-footer{padding:14px 22px;border-top:1px solid rgba(98,211,242,.18);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#muyuu-clear-result .mcr-hashtag{color:#62dff8;font:12px 'Square721BT','Consolas',monospace}
+@media(max-width:760px){#muyuu-clear-result .mcr-layout{grid-template-columns:1fr;gap:12px;padding:12px}#muyuu-clear-result .mcr-preview-empty{min-height:180px}#muyuu-clear-result #mcr-result-canvas{max-height:52vh}#muyuu-clear-result .mcr-header{padding:14px;font-size:10px}#muyuu-clear-result .mcr-footer{padding:12px 14px}}
+</style>
+<div id="muyuu-clear-result" hidden role="dialog" aria-modal="true" aria-labelledby="mcr-title">
+  <div class="mcr-shell">
+    <header class="mcr-header"><span>PROJECT MUYUU / POST-CLEAR ARCHIVE</span><span>FINAL RECORD · 16-F</span></header>
+    <div class="mcr-layout">
+      <section class="mcr-panel">
+        <div class="mcr-kicker">MAIN STORY CLEAR</div>
+        <h1 id="mcr-title">CLEAR RESULT</h1>
+        <p>プレイヤー名を入力すると、クリア時のステータス・装備カード・武器一覧などをまとめた専用リザルト画像を生成します。</p>
+        <label for="mcr-player-name">PLAYER NAME / プレイヤー名（最大50文字）</label>
+        <input id="mcr-player-name" type="text" autocomplete="nickname" placeholder="プレイヤー名を入力" />
+        <div class="mcr-counter"><span id="mcr-name-count">0</span> / 50</div>
+        <div class="mcr-actions"><button id="mcr-generate" class="primary" type="button">GENERATE RESULT IMAGE</button></div>
+        <p id="mcr-status" class="mcr-status" role="status" aria-live="polite">名前を入力し、結果画像を生成してください。</p>
+        <div class="mcr-actions">
+          <button id="mcr-save" type="button" disabled>SAVE PNG</button>
+          <button id="mcr-share" type="button" disabled>SHARE TO X</button>
+        </div>
+        <p>画像を保存しておけば、あとからでも結果をシェアできます。画像共有に対応していない環境では、PNG保存後にXの投稿画面を開きます。</p>
+      </section>
+      <section class="mcr-panel mcr-preview">
+        <div class="mcr-preview-title"><span>GENERATED CLEAR CARD</span><span>PNG / 1600PX</span></div>
+        <div id="mcr-preview-empty" class="mcr-preview-empty">RESULT IMAGE NOT GENERATED<br>YOUR CLEAR RECORD WILL APPEAR HERE</div>
+        <canvas id="mcr-result-canvas" width="1600" height="2200" hidden></canvas>
+      </section>
+    </div>
+    <footer class="mcr-footer"><span class="mcr-hashtag">#Mtps_MUYUU</span><button id="mcr-continue" type="button">CONTINUE TO TITLE →</button></footer>
+  </div>
+</div>
+<script id="muyuu-v51-clear-result-controller">
+(() => {
+  const overlay = document.getElementById('muyuu-clear-result');
+  const nameInput = document.getElementById('mcr-player-name');
+  const counter = document.getElementById('mcr-name-count');
+  const canvas = document.getElementById('mcr-result-canvas');
+  const emptyPreview = document.getElementById('mcr-preview-empty');
+  const status = document.getElementById('mcr-status');
+  const saveButton = document.getElementById('mcr-save');
+  const shareButton = document.getElementById('mcr-share');
+  const generateButton = document.getElementById('mcr-generate');
+  const continueButton = document.getElementById('mcr-continue');
+  if (!overlay || !canvas || !nameInput) return;
+  let resultSnapshot = null, continueHandler = null, resultBlob = null, resultFile = null, generatedName = '';
+  nameInput.addEventListener('input', () => {
+    const chars = Array.from(nameInput.value);
+    if (chars.length > 50) nameInput.value = chars.slice(0, 50).join('');
+    if (counter) counter.textContent = String(Array.from(nameInput.value).length);
+  });
+  function safeText(value, fallback='—') { const str = String(value ?? '').trim(); return str || fallback; }
+  function captureSnapshot() {
+    const snapshot = { stage:'16-F', name:'', hp:0, maxHp:0, ammo:0, maxAmmo:0, weapon:'Unknown', weaponId:'', weapons:[], cards:[], cardLevel:1, cardXP:0, money:0, kills:0, totalEnemies:0, quests:0, accessories:[], attachments:[], traits:[], clearDate:new Date().toLocaleString('ja-JP'), reward:'ARSENAL UNIT' };
+    try { if (typeof activeStageId !== 'undefined' && typeof STAGE_DEFS !== 'undefined') snapshot.stage = STAGE_DEFS[activeStageId]?.levelCode || '16-F'; } catch (_) {}
+    try { if (typeof player !== 'undefined') { snapshot.hp = Math.max(0, Number(player.hp)||0); snapshot.maxHp = Math.max(1, Number(player.maxHp)||1); snapshot.ammo = Math.max(0, Number(player.ammo)||0); snapshot.maxAmmo = Math.max(0, Number(player.maxAmmo)||0); snapshot.weaponId = String(player.wid||''); snapshot.weapon = (typeof WEAPON_BY_ID !== 'undefined' && WEAPON_BY_ID[player.wid]) ? (WEAPON_BY_ID[player.wid].jp || WEAPON_BY_ID[player.wid].name || player.wid) : safeText(player.wid,'Unknown'); } } catch (_) {}
+    try { snapshot.kills = Math.max(0, Number(killCount)||0); snapshot.totalEnemies = Math.max(snapshot.kills, Number(totalEnemies)||0); } catch (_) {}
+    try { if (typeof cardState !== 'undefined') { snapshot.cardLevel = Number(cardState.level)||1; snapshot.cardXP = Number(cardState.xp)||0; snapshot.money = Number(cardState.money)||0; snapshot.cards = (cardState.equipped||[]).map(uid => { const card = (cardState.cards||[]).find(c => String(c.uid)===String(uid)); if (!card) return null; const blueprint = (typeof CARD_BLUEPRINT_BY_ID !== 'undefined' && CARD_BLUEPRINT_BY_ID[card.blueprintId]) ? CARD_BLUEPRINT_BY_ID[card.blueprintId] : null; const traits = (card.traits||[]).map(id => (typeof CARD_TRAIT_BY_ID !== 'undefined' && CARD_TRAIT_BY_ID[id]) ? (CARD_TRAIT_BY_ID[id].name||id) : id); return { name: safeText(blueprint?.name || blueprint?.title || card.name || card.blueprintId,'Unknown Card'), hp:Number(card.stats?.hp)||0, atk:Number(card.stats?.atk)||0, def:Number(card.stats?.def)||0, traits }; }).filter(Boolean).slice(0,6); } } catch (_) {}
+    try { if (typeof weaponPurchaseState !== 'undefined' && typeof WEAPON_BY_ID !== 'undefined') snapshot.weapons = Array.from(new Set(weaponPurchaseState.owned||[])).map(id => WEAPON_BY_ID[id] ? { id, name:safeText(WEAPON_BY_ID[id].jp||WEAPON_BY_ID[id].name||id), active:id===snapshot.weaponId, group:safeText(WEAPON_BY_ID[id].grp||WEAPON_BY_ID[id].cat,'WEAPON') } : null).filter(Boolean).sort((a,b)=>a.name.localeCompare(b.name,'ja')); } catch (_) {}
+    try { if (typeof accessoryState !== 'undefined' && typeof ACCESSORY_BY_ID !== 'undefined') snapshot.accessories = (accessoryState.equipped||[]).map(id=>ACCESSORY_BY_ID[id]?.name||ACCESSORY_BY_ID[id]?.jp||id); } catch (_) {}
+    try { if (typeof attachmentState !== 'undefined' && typeof ATTACHMENT_BY_ID !== 'undefined') snapshot.attachments = ((attachmentState.equipped||{})[snapshot.weaponId]||[]).map(id=>ATTACHMENT_BY_ID[id]?.name||ATTACHMENT_BY_ID[id]?.jp||id); } catch (_) {}
+    try { if (typeof equippedTraitEntries === 'function') snapshot.traits = equippedTraitEntries().map(t=>safeText(t.name||t.id)); } catch (_) {}
+    try { if (typeof questState !== 'undefined') snapshot.quests = Array.isArray(questState.completed) ? questState.completed.length : 0; } catch (_) {}
+    return snapshot;
+  }
+  window.__muyuuCaptureClearSnapshot = captureSnapshot;
+  function roundedPanel(ctx,x,y,w,h,fill,stroke='#24526a') { ctx.fillStyle=fill; ctx.fillRect(x,y,w,h); ctx.strokeStyle=stroke; ctx.lineWidth=2; ctx.strokeRect(x,y,w,h); }
+  function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines=4) {
+    const chars = Array.from(String(text ?? '')); let line = '', lines = [];
+    for (const ch of chars) { const test=line+ch; if (line && ctx.measureText(test).width>maxWidth) { lines.push(line); line=ch; } else line=test; }
+    if (line) lines.push(line);
+    if (lines.length>maxLines) { lines=lines.slice(0,maxLines); let last=lines[maxLines-1]; while(last && ctx.measureText(last+'…').width>maxWidth) last=Array.from(last).slice(0,-1).join(''); lines[maxLines-1]=last+'…'; }
+    lines.forEach((l,i)=>ctx.fillText(l,x,y+i*lineHeight)); return lines.length*lineHeight;
+  }
+  function drawResultImage(snapshot, playerName) {
+    const cards = Array.isArray(snapshot.cards)?snapshot.cards:[];
+    const weapons = Array.isArray(snapshot.weapons)?snapshot.weapons:[];
+    const cardRows = Math.max(1,Math.ceil(cards.length/2));
+    const weaponRows = Math.max(1,Math.ceil(weapons.length/2));
+    const cardStartY = 910;
+    const cardsEndY = cardStartY + 44 + cardRows*142;
+    const weaponTitleY = cardsEndY + 48;
+    const weaponStartY = weaponTitleY + 48;
+    const loadoutTitleY = weaponStartY + weaponRows*48 + 36;
+    const footerY = loadoutTitleY + 300;
+    const W=1600, H=footerY+100, pad=76;
+    canvas.width=W; canvas.height=H;
+    const ctx=canvas.getContext('2d'); if(!ctx) throw new Error('Canvas could not be initialized.');
+    ctx.clearRect(0,0,W,H);
+    const bg=ctx.createLinearGradient(0,0,W,H); bg.addColorStop(0,'#071827');bg.addColorStop(.5,'#050a13');bg.addColorStop(1,'#120a1d');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(69,211,247,.075)';ctx.lineWidth=1;for(let x=0;x<W;x+=64){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}for(let y=0;y<H;y+=64){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    ctx.fillStyle='#50e3ff';ctx.fillRect(pad,52,W-pad*2,4);
+    ctx.font='16px Square721BT, Consolas, monospace';ctx.fillStyle='#79bbd0';ctx.fillText('PROJECT MUYUU  /  2D ACTION GAME',pad,92);ctx.textAlign='right';ctx.fillText('CLEAR RECORD · '+safeText(snapshot.stage,'16-F'),W-pad,92);ctx.textAlign='left';
+    ctx.font='bold 68px Square721BT, "Segoe UI", sans-serif';ctx.fillStyle='#f6fbff';ctx.fillText('MAIN STORY CLEAR',pad,202);
+    ctx.font='22px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle='#a9c8d9';ctx.fillText('PLAYER RECORD / '+safeText(snapshot.clearDate),pad,250);
+    ctx.font='bold 42px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle='#ffffff';wrapText(ctx,playerName,pad,318,W-pad*2,54,2);
+    roundedPanel(ctx,pad,365,W-pad*2,235,'rgba(5,18,31,.94)','#347991');
+    ctx.font='16px Square721BT, Consolas, monospace';ctx.fillStyle='#62dff8';ctx.fillText('FINAL STATUS',pad+28,406);
+    ctx.font='bold 40px Square721BT, Consolas, monospace';ctx.fillStyle='#ffffff';ctx.fillText(Math.round(snapshot.hp)+' / '+Math.round(snapshot.maxHp)+' HP',pad+28,466);
+    const hpRatio=Math.max(0,Math.min(1,snapshot.hp/Math.max(1,snapshot.maxHp)));
+    ctx.fillStyle='#172b3a';ctx.fillRect(pad+28,488,880,22);const hpGrad=ctx.createLinearGradient(pad+28,0,pad+908,0);hpGrad.addColorStop(0,'#36d7f4');hpGrad.addColorStop(1,'#69f0ae');ctx.fillStyle=hpGrad;ctx.fillRect(pad+28,488,880*hpRatio,22);
+    ctx.font='16px Square721BT, Consolas, monospace';ctx.fillStyle='#92b6c7';ctx.fillText('VITAL INTEGRITY '+Math.round(hpRatio*100)+'%',pad+28,545);
+    ctx.font='bold 22px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle='#ffffff';wrapText(ctx,'装備中：'+safeText(snapshot.weapon),pad+970,456,480,32,3);
+    ctx.font='15px Square721BT, Consolas, monospace';ctx.fillStyle='#9dc4d4';ctx.fillText('AMMO '+Math.round(snapshot.ammo)+' / '+Math.round(snapshot.maxAmmo),pad+970,545);
+    roundedPanel(ctx,pad,630,W-pad*2,220,'rgba(5,18,31,.84)','#244b65');
+    const metrics=[['CARD LEVEL',String(snapshot.cardLevel)],['RESEARCH XP',Math.round(snapshot.cardXP).toLocaleString('ja-JP')],['CREDITS',Math.round(snapshot.money).toLocaleString('ja-JP')+' G'],['SECTOR KILLS',Math.round(snapshot.kills)+' / '+Math.round(snapshot.totalEnemies)],['WEAPONS OWNED',String(weapons.length)],['QUESTS CLEARED',String(snapshot.quests)]];
+    metrics.forEach((m,i)=>{const col=i%3,row=Math.floor(i/3),x=pad+28+col*470,y=681+row*84;ctx.font='14px Square721BT, Consolas, monospace';ctx.fillStyle='#64c5df';ctx.fillText(m[0],x,y);ctx.font='bold 27px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle='#f0fbff';ctx.fillText(m[1],x,y+38);});
+    ctx.font='18px Square721BT, Consolas, monospace';ctx.fillStyle='#61def8';ctx.fillText('EQUIPPED CARDS  /  '+cards.length+' OF 6',pad,cardStartY);
+    if(!cards.length){roundedPanel(ctx,pad,cardStartY+18,W-pad*2,95,'rgba(5,18,31,.75)','#203c52');ctx.font='16px "LINE Seed JP", sans-serif';ctx.fillStyle='#93afbf';ctx.fillText('装備カードなし',pad+22,cardStartY+72);}
+    cards.forEach((card,i)=>{const col=i%2,row=Math.floor(i/2),x=pad+col*728,y=cardStartY+24+row*142;roundedPanel(ctx,x,y,700,124,'rgba(6,20,34,.88)','#28566f');ctx.font='bold 22px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle='#f3fbff';wrapText(ctx,card.name,x+18,y+34,660,26,1);ctx.font='15px Square721BT, Consolas, monospace';ctx.fillStyle='#92d9eb';ctx.fillText('HP '+card.hp+'   ATK '+card.atk+'   DEF '+card.def,x+18,y+66);ctx.font='13px "LINE Seed JP", sans-serif';ctx.fillStyle='#9fb7c8';wrapText(ctx,card.traits.length?'TRAITS: '+card.traits.join(' / '):'TRAITS: —',x+18,y+94,660,20,1);});
+    ctx.font='18px Square721BT, Consolas, monospace';ctx.fillStyle='#61def8';ctx.fillText('WEAPON ARCHIVE  /  '+weapons.length+' OWNED',pad,weaponTitleY);
+    if(!weapons.length){ctx.font='16px "LINE Seed JP", sans-serif';ctx.fillStyle='#93afbf';ctx.fillText('武器データなし',pad,weaponStartY+24);}
+    weapons.forEach((weapon,i)=>{const col=i%2,row=Math.floor(i/2),x=pad+col*728,y=weaponStartY+row*48;ctx.fillStyle=weapon.active?'rgba(20,87,111,.52)':'rgba(6,18,30,.66)';ctx.fillRect(x,y,700,39);ctx.strokeStyle=weapon.active?'#4be1fb':'#1f4258';ctx.strokeRect(x,y,700,39);ctx.font='16px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle=weapon.active?'#b9f5ff':'#d5e8f1';wrapText(ctx,weapon.name+(weapon.active?'  [EQUIPPED]':''),x+13,y+25,660,20,1);});
+    ctx.font='18px Square721BT, Consolas, monospace';ctx.fillStyle='#61def8';ctx.fillText('ACTIVE LOADOUT / OTHER RECORDS',pad,loadoutTitleY);
+    const loadoutLines=[
+      'ATTACHMENTS: '+(snapshot.attachments.length?snapshot.attachments.join(' / '):'—'),
+      'ACCESSORIES: '+(snapshot.accessories.length?snapshot.accessories.join(' / '):'—'),
+      'ACTIVE CARD TRAITS: '+(snapshot.traits.length?snapshot.traits.join(' / '):'—'),
+      'CLEAR REWARD: ARSENAL UNIT / WHITE WING JET SYSTEM'
+    ];
+    ctx.font='16px "LINE Seed JP", "Segoe UI", sans-serif';ctx.fillStyle='#b4cad6';loadoutLines.forEach((line,i)=>{wrapText(ctx,line,pad,loadoutTitleY+42+i*48,W-pad*2,22,2);});
+    ctx.fillStyle='#50e3ff';ctx.fillRect(pad,H-78,W-pad*2,3);ctx.font='15px Square721BT, Consolas, monospace';ctx.fillStyle='#7bb7cc';ctx.fillText('#Mtps_MUYUU',pad,H-43);ctx.textAlign='right';ctx.fillText('THANK YOU FOR PLAYING  ·  PROJECT MUYUU',W-pad,H-43);ctx.textAlign='left';
+  }
+  async function generate() {
+    const playerName = Array.from(nameInput.value.trim()).slice(0,50).join('');
+    if (!playerName) { status.textContent='プレイヤー名を入力してください。'; nameInput.focus(); return; }
+    nameInput.value = playerName; if (counter) counter.textContent=String(Array.from(playerName).length);
+    generateButton.disabled=true;
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      drawResultImage(resultSnapshot||{},playerName);
+      resultBlob = await new Promise(resolve => canvas.toBlob(resolve,'image/png')); 
+      if (!resultBlob) throw new Error('PNGの生成に失敗しました。');
+      resultFile = (typeof File==='function') ? new File([resultBlob], 'MUYUU_CLEAR_RESULT.png', {type:'image/png'}) : null;
+      generatedName = playerName;
+      canvas.hidden=false; if(emptyPreview)emptyPreview.hidden=true;
+      saveButton.disabled=false;shareButton.disabled=false;
+      status.textContent='リザルト画像を生成しました。PNG保存またはX共有ができます。';
+    } catch (error) { status.textContent='画像を生成できませんでした：'+(error?.message||'unknown error'); }
+    finally { generateButton.disabled=false; }
+  }
+  function downloadResult() {
+    if (!resultBlob) { status.textContent='先にリザルト画像を生成してください。'; return; }
+    const safeName = (generatedName||'PLAYER').replace(/[^a-zA-Z0-9ぁ-んァ-ヶ一-龠_-]/g,'_').slice(0,50)||'PLAYER';
+    const url=URL.createObjectURL(resultBlob);const a=document.createElement('a');a.href=url;a.download='MUYUU_CLEAR_RESULT_'+safeName+'.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);
+    status.textContent='PNG画像を保存しました。';
+  }
+  function openTwitterIntent() {
+    const text = 'PROJECT MUYUU — MAIN STORY CLEAR / '+(generatedName||'PLAYER');
+    const url='https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&hashtags=Mtps_MUYUU';
+    window.open(url,'_blank','noopener,noreferrer');
+    downloadResult();
+    status.textContent='Xの投稿画面を開きました。保存されたPNG画像を投稿に添付してください。';
+  }
+  async function shareResult() {
+    if (!resultBlob) return;
+    const text='PROJECT MUYUU — MAIN STORY CLEAR / '+(generatedName||'PLAYER')+' #Mtps_MUYUU';
+    if (resultFile && navigator.share && navigator.canShare) {
+      try { if (navigator.canShare({files:[resultFile]})) { await navigator.share({files:[resultFile], title:'PROJECT MUYUU CLEAR RESULT', text}); status.textContent='共有メニューを開きました。Xを選択して投稿できます。'; return; } } catch (error) { if (error && error.name==='AbortError') { status.textContent='共有をキャンセルしました。'; return; } }
+    }
+    openTwitterIntent();
+  }
+  window.__muyuuShowClearResult = (snapshot, onContinue) => {
+    resultSnapshot = snapshot && typeof snapshot==='object' ? snapshot : captureSnapshot();
+    continueHandler = typeof onContinue==='function' ? onContinue : null;
+    resultBlob=null;resultFile=null;generatedName='';canvas.hidden=true;if(emptyPreview)emptyPreview.hidden=false;saveButton.disabled=true;shareButton.disabled=true;
+    nameInput.value='';if(counter)counter.textContent='0';status.textContent='名前を入力し、結果画像を生成してください。';
+    overlay.hidden=false;overlay.setAttribute('aria-hidden','false');
+    setTimeout(()=>nameInput.focus({preventScroll:true}),80);
+  };
+  generateButton.addEventListener('click', generate);
+  saveButton.addEventListener('click', downloadResult);
+  shareButton.addEventListener('click', shareResult);
+  continueButton.addEventListener('click', () => {
+    overlay.hidden=true;overlay.setAttribute('aria-hidden','true');
+    const callback=continueHandler;continueHandler=null;
+    if (callback) callback();
+  });
+  nameInput.addEventListener('keydown', event => { if(event.key==='Enter'){event.preventDefault();generate();} });
+})();
+</script>
+
 </body>
 </html>
+
+<style id="muyuu-v45-credits-font-system">
+/* Font roles: Square721 BT for compact/technical Latin UI, LINE Seed JP for Japanese and general reading. */
+html, body { font-family: 'Square721BT', 'LINE Seed JP', 'Yu Gothic UI', system-ui, sans-serif; }
+.screen-eyebrow, .screen-title, .screen-title span, .screen-button, .screen-footer,
+.credits-eyebrow, .credits-close, .credits-nav-label, .credit-nav-btn,
+.credit-section-no, .credit-section h2, .credits-content-footer,
+#muyuu-glitch-overlay .glitch-brand, #muyuu-glitch-overlay .glitch-footer {
+  font-family: 'Square721BT', 'LINE Seed JP', 'Yu Gothic UI', sans-serif !important;
+}
+/* Windows 11 BSoD uses the Segoe UI family; prefer the variable face when available. */
+#muyuu-glitch-overlay[data-mode="bsod"],
+#muyuu-glitch-overlay[data-mode="bsod"] * {
+  font-family: 'Segoe UI Variable', 'Segoe UI', 'LINE Seed JP', Arial, sans-serif !important;
+}
+/* Recovery console / BIOS should feel like a Windows terminal, not a proportional UI. */
+#muyuu-glitch-overlay .glitch-terminal,
+#muyuu-glitch-overlay .glitch-terminal *,
+#muyuu-glitch-overlay[data-mode="bios"] {
+  font-family: 'Cascadia Mono', 'Consolas', 'Courier New', monospace !important;
+}
+
+.muyuu-credits-menu { position:fixed; inset:0; z-index:1000001; display:flex; align-items:stretch; justify-content:center; padding:clamp(8px,1.6vw,22px); color:#e4f5ff; background:radial-gradient(ellipse at 16% 10%,rgba(0,175,220,.17),transparent 38%),radial-gradient(ellipse at 90% 88%,rgba(113,69,205,.13),transparent 42%),rgba(1,4,10,.97); backdrop-filter:blur(9px); }
+.muyuu-credits-menu.hidden { display:none; }
+.credits-shell { display:flex; flex-direction:column; width:min(1440px,100%); min-height:0; border:1px solid rgba(90,224,255,.45); background:linear-gradient(145deg,rgba(5,13,24,.98),rgba(3,7,15,.98)); box-shadow:0 0 70px rgba(0,195,255,.08),inset 0 0 45px rgba(0,195,255,.035); overflow:hidden; }
+.credits-topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:clamp(14px,2vw,26px) clamp(16px,2.4vw,34px); border-bottom:1px solid rgba(103,213,242,.22); background:linear-gradient(90deg,rgba(13,31,49,.86),rgba(6,12,23,.75)); }
+.credits-eyebrow { color:#64eaff; font-size:clamp(9px,.8vw,12px); letter-spacing:.22em; margin-bottom:8px; }
+#credits-menu-title { margin:0; color:#f4fbff; font:normal clamp(25px,4vw,49px)/.98 'Square721BT','LINE Seed JP',sans-serif; letter-spacing:.07em; }
+#credits-menu-title span { display:block; margin-top:9px; color:#6e9db4; font:normal clamp(9px,1vw,12px)/1.4 'Square721BT','LINE Seed JP',sans-serif; letter-spacing:.18em; }
+.credits-close { flex:0 0 auto; min-height:46px; padding:0 18px; border:1px solid rgba(100,228,255,.55); background:rgba(23,74,97,.22); color:#dffaff; font-size:11px; letter-spacing:.08em; cursor:pointer; }
+.credits-close:hover,.credits-close:focus-visible { background:rgba(36,166,207,.24); outline:2px solid #62e9ff; outline-offset:2px; }
+.credits-close span { color:#6da3b5; margin-left:8px; }
+.credits-layout { display:grid; grid-template-columns:minmax(180px,235px) minmax(0,1fr); flex:1; min-height:0; }
+.credits-nav { display:flex; flex-direction:column; gap:5px; padding:22px 13px; border-right:1px solid rgba(103,213,242,.18); background:rgba(4,10,19,.7); min-height:0; }
+.credits-nav-label { font-size:10px; color:#577c92; letter-spacing:.2em; padding:0 10px 12px; }
+.credit-nav-btn { display:flex; align-items:baseline; gap:11px; width:100%; padding:12px 10px; border:1px solid transparent; color:#8daec1; background:transparent; font-size:10px; text-align:left; letter-spacing:.025em; cursor:pointer; }
+.credit-nav-btn span { line-height:1.4; }
+.credit-nav-btn:hover,.credit-nav-btn.active { color:#e6fbff; border-color:rgba(69,219,255,.34); background:linear-gradient(90deg,rgba(40,174,219,.14),transparent); }
+.credit-nav-btn.active { box-shadow:inset 2px 0 #4bddff; }
+.credits-nav-foot { margin-top:auto; padding:14px 10px 2px; border-top:1px solid rgba(103,213,242,.14); color:#4c7084; font:10px/1.8 'Square721BT','Consolas',monospace; letter-spacing:.08em; }
+.credits-nav-foot b { color:#56d9ad; font-weight:normal; }
+.credits-content { min-width:0; min-height:0; overflow:auto; overscroll-behavior:contain; padding:clamp(18px,3vw,42px); scroll-behavior:smooth; scrollbar-color:#236581 #07111d; font-family:'LINE Seed JP','Square721BT','Yu Gothic UI',sans-serif; }
+.credit-section { padding:0 0 clamp(28px,4vw,52px); margin:0 0 clamp(27px,3.5vw,45px); border-bottom:1px solid rgba(109,194,225,.2); scroll-margin-top:10px; }
+.credit-section-no { color:#5b97b0; font-size:10px; letter-spacing:.2em; margin-bottom:12px; }
+.credit-section h2 { margin:0 0 22px; color:#b9efff; font-size:clamp(18px,2.2vw,26px); line-height:1.2; font-weight:normal; letter-spacing:.055em; }
+.credit-lead { padding:10px 0 clamp(28px,4vw,52px); }
+.credit-feature-name { display:inline-flex; flex-wrap:wrap; align-items:baseline; gap:8px; max-width:100%; padding:15px 19px; background:linear-gradient(90deg,rgba(18,126,162,.2),rgba(20,41,67,.25)); border-left:3px solid #48dafa; color:#f2fcff; font-size:clamp(17px,2vw,24px); line-height:1.55; overflow-wrap:anywhere; }
+.credit-feature-name span,.credit-name-card span { display:inline; color:#6f91a7; font-size:.82em; overflow-wrap:anywhere; }
+.credit-name-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.credit-name-grid-3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.credit-name-card { min-width:0; padding:12px 14px; border:1px solid rgba(100,157,190,.23); background:linear-gradient(120deg,rgba(13,29,46,.85),rgba(6,14,25,.75)); color:#dcebf5; font-size:14px; line-height:1.65; overflow-wrap:anywhere; }
+.credit-track-list { list-style:none; display:flex; flex-direction:column; gap:7px; padding:0; margin:0; }
+.credit-track-list li { display:grid; grid-template-columns:36px minmax(0,1fr); gap:10px; padding:11px 13px; border:1px solid rgba(100,157,190,.17); background:rgba(10,25,41,.62); color:#dae9f4; font-size:13px; line-height:1.6; overflow-wrap:anywhere; }
+.credit-track-list li>span { color:#48cce9; font:11px 'Square721BT','Consolas',monospace; padding-top:3px; }
+.credit-track-list b { color:#99cadb; font-weight:normal; }
+.credit-community { text-align:center; padding-top:10px; border-bottom:0; }
+.credit-community h2 { color:#fff; font-size:clamp(30px,5vw,56px); letter-spacing:.14em; text-shadow:0 0 24px rgba(72,218,250,.35); }
+.credit-community-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; max-width:730px; margin:0 auto 28px; }
+.credit-community-list div { padding:13px 8px; color:#8eafc0; background:rgba(13,27,42,.72); border:1px solid rgba(100,157,190,.18); font-size:12px; overflow-wrap:anywhere; }
+.credit-you { padding:22px 0; color:#c8edf9; font-size:18px; letter-spacing:.14em; }
+.credit-you strong { display:block; margin-top:6px; color:#f5feff; font:normal clamp(38px,7vw,76px)/1.1 'Square721BT','LINE Seed JP',sans-serif; letter-spacing:.12em; text-shadow:0 0 30px rgba(70,224,255,.28); }
+.credit-community>p { color:#5d8da4; font:10px 'Square721BT','LINE Seed JP',sans-serif; letter-spacing:.2em; }
+.credits-content-footer { display:flex; justify-content:space-between; gap:12px; padding:18px 0 4px; border-top:1px solid rgba(109,194,225,.2); color:#4e778d; font-size:9px; letter-spacing:.12em; }
+.credits-content-footer span { text-align:right; }
+
+@media (max-width:760px) {
+  .muyuu-credits-menu { padding:0; }
+  .credits-shell { border-left:0; border-right:0; }
+  .credits-topbar { padding:13px 14px; align-items:center; }
+  #credits-menu-title { font-size:clamp(23px,6.5vw,34px); }
+  #credits-menu-title span { max-width:52vw; font-size:8px; letter-spacing:.07em; }
+  .credits-close { min-height:42px; padding:0 10px; font-size:10px; }
+  .credits-layout { grid-template-columns:1fr; grid-template-rows:auto minmax(0,1fr); }
+  .credits-nav { flex-direction:row; overflow-x:auto; overflow-y:hidden; padding:8px 10px; border-right:0; border-bottom:1px solid rgba(103,213,242,.18); gap:6px; scrollbar-width:thin; }
+  .credits-nav-label,.credits-nav-foot { display:none; }
+  .credit-nav-btn { flex:0 0 auto; width:auto; min-width:max-content; padding:10px 12px; border:1px solid rgba(100,157,190,.17); font-size:9px; }
+  .credit-nav-btn.active { box-shadow:inset 0 -2px #4bddff; }
+  .credits-content { padding:22px 15px 28px; }
+  .credit-name-grid,.credit-name-grid-3 { grid-template-columns:1fr; }
+  .credit-name-card { font-size:13px; padding:11px 12px; }
+  .credit-track-list li { font-size:12px; grid-template-columns:27px minmax(0,1fr); padding:10px; }
+  .credit-community-list { grid-template-columns:1fr; }
+  .credits-content-footer { flex-direction:column; font-size:8px; }
+  .credits-content-footer span { text-align:left; }
+}
+@media (prefers-reduced-motion: reduce) { .credits-content { scroll-behavior:auto; } }
+</style>
+
+
+
+<style id="muyuu-v46-credit-unlock-style">
+.credit-lock-notice.hidden,#credit-bgm-stage17-tracks.hidden,#credit-stage16-reveal.hidden { display:none!important; }
+.credit-handle { color:#5de1ff; text-decoration:none; border-bottom:1px dotted rgba(93,225,255,.55); overflow-wrap:anywhere; }
+.credit-handle:hover,.credit-handle:focus-visible { color:#fff; border-bottom-style:solid; text-shadow:0 0 12px #38bdf8; outline:none; }
+.credit-concept-names { display:flex; flex-direction:column; align-items:flex-start; gap:7px; }
+.credit-person { display:block; color:#f2fcff; }
+.credit-lock-notice { display:flex; flex-direction:column; gap:8px; margin:14px 0; padding:18px 20px; border:1px solid rgba(250,204,21,.38); border-left:3px solid #facc15; background:linear-gradient(105deg,rgba(120,77,9,.2),rgba(10,20,32,.72)); color:#d8e9f4; text-align:left; line-height:1.65; }
+.credit-lock-notice b { color:#fde68a; font:normal 11px 'Square721BT','Consolas',monospace; letter-spacing:.14em; }
+.credit-lock-notice span { color:#8daec1; font-size:12px; }
+.credit-stage-gated { margin-top:13px; }
+.credit-thank-you { color:#b5f4ff!important; font:normal clamp(18px,3vw,26px) 'Square721BT','LINE Seed JP',sans-serif!important; letter-spacing:.08em!important; text-shadow:0 0 18px rgba(72,218,250,.24); }
+.credit-project-end { margin:12px auto 28px; padding:12px; border-top:1px solid rgba(100,220,255,.23); border-bottom:1px solid rgba(100,220,255,.23); color:#fff1a8; font:normal clamp(17px,2.4vw,24px) 'Square721BT','LINE Seed JP',sans-serif; letter-spacing:.12em; }
+.credit-message-block,.credit-promo-panel { margin:24px 0 0; padding:clamp(16px,2.8vw,28px); border:1px solid rgba(100,157,190,.22); background:linear-gradient(145deg,rgba(11,25,40,.85),rgba(4,10,18,.86)); text-align:left; }
+.credit-message-block h3,.credit-promo-panel h3 { margin:0 0 14px; color:#b9efff; font-size:clamp(17px,2vw,22px); font-weight:normal; }
+.credit-message-block p,.credit-promo-reward p { color:#c0d5e1; font-size:13px; line-height:1.95; }
+.credit-promo-form { display:flex; gap:9px; margin:10px 0 8px; }
+.credit-promo-form input { min-width:0; flex:1; height:48px; padding:0 13px; box-sizing:border-box; border:1px solid rgba(100,220,255,.4); background:#030914; color:#eafaff; font:14px 'LINE Seed JP','Yu Gothic UI',sans-serif; border-radius:0; }
+.credit-promo-form input:focus { outline:2px solid #38bdf8; outline-offset:2px; }
+.credit-promo-submit { min-height:48px; padding:0 17px; border:1px solid #46d8ff; color:#03101a; background:#38bdf8; font-weight:700; cursor:pointer; white-space:nowrap; }
+.credit-promo-submit:hover { background:#a5f3fc; }
+.credit-promo-status { margin:9px 0 18px; color:#8eb4c7; font-size:12px; line-height:1.7; overflow-wrap:anywhere; }
+.credit-promo-status.error { color:#fda4af; }
+.credit-promo-status.success { color:#86efac; }
+.credit-promo-status code { color:#fff1a8; font:12px 'Consolas',monospace; }
+.credit-promo-reward { padding:15px; border-left:2px solid #fde68a; background:rgba(250,204,21,.055); }
+.credit-promo-reward h4 { margin:0 0 10px; color:#fff1a8; font-size:17px; font-weight:normal; }
+.credit-promo-reward h4 span { display:block; margin-top:4px; color:#8baabe; font-size:11px; }
+.credit-promo-reward p { margin:5px 0; }
+.credit-promo-mobile-note { color:#6f9aaf!important; font-size:11px!important; }
+.credit-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:600px){ .credit-promo-form { flex-direction:column; } .credit-promo-submit { width:100%; } .credit-promo-reward { padding:12px; } }
+</style>
+
+
+<style id="muyuu-v46-longinus-touch-style">
+#muyuu-touch-controls button#muyuu-longinus-throw-button { border-color:rgba(255,241,168,.9); color:#fff1a8; background:rgba(82,59,8,.86); }
+#muyuu-touch-controls button#muyuu-longinus-throw-button.active,#muyuu-touch-controls button#muyuu-longinus-throw-button:active { background:rgba(202,138,4,.95); color:#fff; }
+#credits-menu-title { letter-spacing:.06em; }
+</style>
+
+<script id="muyuu-v45-credits-menu-controller">
+(() => {
+  const menu = document.getElementById('muyuu-credits-menu');
+  if (!menu) return;
+  const closeBtn = document.getElementById('credits-menu-close');
+  const content = document.getElementById('credits-content');
+  const navButtons = Array.from(menu.querySelectorAll('[data-credit-target]'));
+  const stage17Lock = document.getElementById('credit-bgm-stage17-lock');
+  const stage17Tracks = document.getElementById('credit-bgm-stage17-tracks');
+  const stage16Lock = document.getElementById('credit-stage16-lock');
+  const stage16Reveal = document.getElementById('credit-stage16-reveal');
+  let lastTrigger = null;
+  function creditsProgress() {
+    let finalClear = false, stage17Clear = false;
+    try {
+      finalClear = !!(typeof storyState !== 'undefined' && (storyState.flags?.final_boss_defeated || storyState.endings?.includes('final')));
+      stage17Clear = !!(typeof storyState !== 'undefined' && storyState.flags?.stage17_cleared);
+    } catch (_) {}
+    return { finalClear, stage17Clear };
+  }
+  function updateCreditsUnlocks() {
+    const progress = creditsProgress();
+    if (stage17Lock) stage17Lock.classList.toggle('hidden', progress.stage17Clear);
+    if (stage17Tracks) stage17Tracks.classList.toggle('hidden', !progress.stage17Clear);
+    if (stage16Lock) stage16Lock.classList.toggle('hidden', progress.finalClear);
+    if (stage16Reveal) stage16Reveal.classList.toggle('hidden', !progress.finalClear);
+    return progress;
+  }
+  function openCreditsMenu(event) {
+    if (event && event.currentTarget) lastTrigger = event.currentTarget;
+    updateCreditsUnlocks();
+    menu.classList.remove('hidden');
+    if (content) content.scrollTop = 0;
+    navButtons.forEach((button, index) => {
+      const active = index === 0;
+      button.classList.toggle('active', active);
+      if (active) button.setAttribute('aria-current', 'location');
+      else button.removeAttribute('aria-current');
+    });
+    closeBtn?.focus({ preventScroll: true });
+  }
+  function closeCreditsMenu() {
+    if (menu.classList.contains('hidden')) return;
+    menu.classList.add('hidden');
+    if (lastTrigger && typeof lastTrigger.focus === 'function' && lastTrigger.isConnected) {
+      lastTrigger.focus({ preventScroll: true });
+    }
+  }
+  document.getElementById('start-credits-btn')?.addEventListener('click', openCreditsMenu);
+  document.getElementById('pause-credits-btn')?.addEventListener('click', openCreditsMenu);
+  closeBtn?.addEventListener('click', closeCreditsMenu);
+
+  menu.addEventListener('click', event => {
+    if (event.target === menu) closeCreditsMenu();
+  });
+  navButtons.forEach(button => button.addEventListener('click', () => {
+    const target = document.getElementById(button.dataset.creditTarget);
+    if (!target || !content) return;
+    const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    const top = target.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop;
+    content.scrollTo({ top, behavior });
+    navButtons.forEach(other => {
+      const active = other === button;
+      other.classList.toggle('active', active);
+      if (active) other.setAttribute('aria-current', 'location');
+      else other.removeAttribute('aria-current');
+    });
+  }));
+  // Capture Esc before the game's pause/menu handlers so credits close first.
+  document.addEventListener('keydown', event => {
+    if (menu.classList.contains('hidden')) return;
+    if (event.key === 'Escape' || event.code === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      closeCreditsMenu();
+    }
+  }, true);
+  // Keep keyboard focus inside the dialog while it is open.
+  menu.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const focusable = Array.from(menu.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex="0"]'))
+      .filter(element => element.getClientRects().length > 0);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
+})();
+</script>
+
