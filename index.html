@@ -1596,7 +1596,8 @@ const uiDistFill = document.getElementById('dist-fill');
 const keys = { left: false, right: false, up: false, down: false, z: false, x: false, c: false, shift: false, r: false, t: false, q: false, e: false };
 const justPressed = { up: false, z: false, x: false, c: false, r: false, t: false, q: false, e: false };
 window.keys = keys; window.justPressed = justPressed;
-window.interactWithNPC = (...args) => interactWithNPC(...args);
+// Public bridge for keyboard/touch controls. Use a differently named implementation to avoid self-recursion.
+window.interactWithNPC = (...args) => performNPCInteraction(...args);
 const movementTapAt = {left:0, right:0, up:0, down:0};
 const DOUBLE_TAP_WINDOW_MS = 270;
 
@@ -1645,7 +1646,7 @@ window.addEventListener('keydown', (e) => {
             startQuickBoost(dashVector[0], dashVector[1]);
         } else movementTapAt[tapDir] = now;
     }
-    if (code === 'KeyF' && !e.repeat) { interactWithNPC(); return; }
+    if (code === 'KeyF' && !e.repeat) { performNPCInteraction(); return; }
     if (code === 'KeyQ') { if (!keys.q) justPressed.q = true; keys.q = true; }
     if (code === 'KeyE') { if (!keys.e) justPressed.e = true; keys.e = true; }
     if (code === 'KeyA' || code === 'ArrowLeft') keys.left = true;
@@ -1918,7 +1919,14 @@ const STAGE_BOSSES = {
     archive_vault:{name:'ARCHIVE WARDEN / 記録守護者',shortName:'ARCHIVE WARDEN',archetype:'archive_warden',color:'#63e6f2',hp:94000,armor:.37,xp:9800,attachment:null,phase2:'記録飽和',style:{p1:['archiveStamp','splitBeam','targetBurst'],p2:['archiveRain','archiveStamp','radial'],speed:.68}},
     source_chamber:{name:'ORIGIN KEEPER / 起源守護機',shortName:'ORIGIN KEEPER',archetype:'origin_keeper',color:'#ff8dba',hp:108000,armor:.36,xp:11200,attachment:null,phase2:'起源解放',style:{p1:['originSeed','singularity','terminalPulse'],p2:['originBurst','originSeed','phaseEcho'],speed:.66}},
     final_16:{name:'Tokonagi : The Terminal Judgement',shortName:'TOKONAGI',archetype:'terminal_judgement',color:'#f8f6ff',hp:154000,armor:.32,xp:18000,attachment:null,phase2:'TERMINAL ABSOLUTE',style:{p1:['terminalLaser','terminalPulse','riftFold'],p2:['terminalCollapse','terminalLaser','phaseEcho'],speed:.62}},
-    stage_17:{name:'SERAPHIM : TRUE ALIVE⇆TRUE DEATH',shortName:'SERAPHIM',archetype:'seraphim_true',color:'#fff1a8',hp:285000,armor:.18,xp:88000,attachment:null,phase2:'TRUE DEATH / ABSOLUTE',style:{p1:['seraphCharge','funnel','seraphLaser','crossLances','orbitalRain','phaseEcho','judgementLattice','radial','eclipseCrescent','seraphRift'],p2:['seraphCharge','funnelCross','deathNova','terminalLaser','inversionBurst','seraphRift','archiveRain','judgementLattice','originBurst','terminalCollapse','radial','seraphLaser'],speed:.58}}
+    stage_17:{name:'SERAPHIM : TRUE ALIVE⇆TRUE DEATH',shortName:'SERAPHIM',archetype:'seraphim_true',color:'#fff1a8',hp:427500,armor:.18,xp:88000,attachment:null,phase2:'TRUE DEATH / ABSOLUTE',style:{
+        p1:['seraphCharge','funnel','seraphLaser','crossLances','orbitalRain','phaseEcho','judgementLattice','radial','eclipseCrescent','seraphRift'],
+        p2:['seraphCharge','funnelCross','deathNova','terminalLaser','inversionBurst','seraphRift','archiveRain','judgementLattice','originBurst','terminalCollapse','radial','seraphLaser'],
+        p3:['deathNova','seraphRift','archiveRain','judgementLattice','terminalLaser','inversionBurst','originBurst','eclipseCrescent','seraphLaser','radial'],
+        p4:['terminalCollapse','funnelCross','archiveRain','deathNova','seraphCharge','originBurst','judgementLattice','seraphLaser','inversionBurst','radial'],
+        p5:['terminalCollapse','deathNova','inversionBurst','originBurst','seraphRift','judgementLattice','terminalLaser','seraphLaser','eclipseCrescent','archiveRain','funnelCross'],
+        speed:.58
+    }}
 };
 // Stage-specific boss-gate descriptors. The canonical stage_17 boss is SERAPHIM; sigma uses the rush table.
 STAGE_BOSSES.stage_17_sigma={name:'OVERDRIVE BOSS RUSH',shortName:'BOSS RUSH',archetype:'void_collapse',color:'#fb4fff',hp:1,armor:0,xp:0,attachment:null,phase2:'RUSH CONTINUES',style:{p1:['fan'],p2:['radial'],speed:.72}};
@@ -3974,7 +3982,7 @@ const pauseScreen = document.getElementById('pause-screen');
 let gameStarted = false, paused = false, pauseAt = 0, idleDrawAt = 0;
 
 // ---------------- BGM管理 ----------------
-// HTMLファイルと同じフォルダに 1.mp3 / 2.mp3 / 3.mp3 / 4.mp3 / Final.mp3 / lastboss.mp3 を配置してください。
+// HTMLファイルと同じフォルダに各BGMを配置してください。0-1～0-4は unknown.mp3、0-0は無音です。
 const MUSIC_TRACKS = {
     title: new Audio('1.mp3'), // スタート画面
     game: new Audio('2.mp3'),  // ゲーム画面
@@ -3984,6 +3992,7 @@ const MUSIC_TRACKS = {
     stage17: new Audio('17.mp3'), // STAGE 17 通常区間
     bossRush: new Audio('bossrush.mp3'), // STAGE 17 歴代ボス連戦
     stage17Boss: new Audio('17boss.mp3'), // STAGE 17 裏ボス専用
+    zeroRoute: new Audio('unknown.mp3'), // STAGE 0-1～0-4
     cards: new Audio('4.mp3')  // カード作成・研究画面
 };
 let currentMusicKey = null;
@@ -3994,6 +4003,9 @@ for (const audio of Object.values(MUSIC_TRACKS)) {
 }
 function desiredMusicKey() {
     if (!gameStarted) return 'title';
+    // 0-0 is intentionally silent. The other zero-route maps share unknown.mp3.
+    if (activeStageId === 'stage_0_0') return null;
+    if (/^stage_0_[1-4]$/.test(String(activeStageId || ''))) return 'zeroRoute';
     // 16-F alone has its own boss theme; 16-1 through 16-9 keep the Final.mp3 chapter theme.
     if (activeStageId === 'final_16') return 'lastBoss';
     if (activeStageId === 'stage_17_sigma') return 'bossRush';
@@ -4004,8 +4016,35 @@ function desiredMusicKey() {
     if (typeof bossRuntime !== 'undefined' && bossRuntime.active && !bossRuntime.cleared) return 'boss';
     return 'game';
 }
+function musicKeyForStage(stageId) {
+    if (stageId === 'stage_0_0') return null;
+    if (/^stage_0_[1-4]$/.test(String(stageId || ''))) return 'zeroRoute';
+    if (stageId === 'final_16') return 'lastBoss';
+    if (stageId === 'stage_17_sigma') return 'bossRush';
+    if (stageId === 'stage_17_omega') return 'stage17';
+    if (stageId === 'stage_17_delta' || stageId === 'stage_17_xi') return 'stage17';
+    if ((STAGE_DEFS[stageId]?.stageNo || 0) === 16) return 'finalBoss';
+    return 'game';
+}
+function primeMusicForStage(stageId) {
+    const track = MUSIC_TRACKS[musicKeyForStage(stageId)];
+    if (!track) return;
+    // Start fetching the incoming track while the transition overlay is visible.
+    track.preload = 'auto';
+    try { if (track.readyState < HTMLMediaElement.HAVE_FUTURE_DATA) track.load(); } catch (_) {}
+}
 function syncMusic(forceRestart = false) {
     const key = desiredMusicKey();
+    // null is a deliberate silent state, not a missing track: stop the previous BGM immediately.
+    if (key == null) {
+        if (currentMusicKey && MUSIC_TRACKS[currentMusicKey]) {
+            const previous = MUSIC_TRACKS[currentMusicKey];
+            previous.pause();
+            try { previous.currentTime = 0; } catch (_) {}
+        }
+        currentMusicKey = null;
+        return;
+    }
     const next = MUSIC_TRACKS[key];
     if (!next) return;
     if (currentMusicKey !== key || forceRestart) {
@@ -4476,7 +4515,7 @@ document.getElementById('attachment-close').addEventListener('click', closeMenu)
 document.getElementById('quest-close').addEventListener('click', closeMenu);
 document.getElementById('dialogue-close').addEventListener('click', closeMenu);
 document.getElementById('dialogue-next').addEventListener('click', advanceDialogue);
-for (const sel of [document.getElementById('stage-select-start'), document.getElementById('stage-select-pause')]) sel.addEventListener('change', () => applyStagePreset(sel.value, true));
+for (const sel of [document.getElementById('stage-select-start'), document.getElementById('stage-select-pause')]) sel.addEventListener('change', () => { applyStagePreset(sel.value, true); syncMusic(); });
 document.getElementById('card-close').addEventListener('click', closeMenu);
 document.getElementById('resume-btn').addEventListener('click', resumeGame);
 document.getElementById('pause-inventory-btn').addEventListener('click', () => openMenu(true));
@@ -6377,10 +6416,11 @@ function completeStage() {
         if(stageClearShown||mapTransitioning)return;
         stageClearShown=true;mapTransitioning=true;const token=++mapTransitionToken;
         const nextId=activeStageId==='stage_17_delta'?'stage_17_xi':activeStageId==='stage_17_xi'?'stage_17_sigma':'stage_17_omega';
+        primeMusicForStage(nextId);
         const def=STAGE_DEFS[activeStageId],next=STAGE_DEFS[nextId],overlay=document.getElementById('map-transition-overlay');
         if(overlay){overlay.style.setProperty('--transition-accent',next.palette.accent||'#fb4fff');document.getElementById('map-transition-kicker').textContent='UNREGISTERED SECTOR CLEARED';document.getElementById('map-transition-name').textContent=next.levelCode+' / '+next.name;document.getElementById('map-transition-sub').textContent='SECTOR DATA TRANSFER · NEXT SIGNATURE AUTHORIZED';overlay.classList.add('active');}
         for(const k in keys)keys[k]=false;player.vx=0;player.vy=0;
-        setTimeout(()=>{if(token!==mapTransitionToken)return;try{applyStagePreset(nextId,true,true);if(overlay)overlay.classList.remove('active');mapTransitioning=false;stageClearShown=false;syncMusic(true);playStageStory();showGameToast(next.levelCode+' / SECTOR LOADED');}catch(err){if(overlay)overlay.classList.remove('active');mapTransitioning=false;stageClearShown=false;console.error('stage17 transfer failed',err);showGameToast('SECTOR TRANSFER ERROR / '+(err?.message||'retry'));}},1600);return;
+        setTimeout(()=>{if(token!==mapTransitionToken)return;try{applyStagePreset(nextId,true,true);syncMusic();if(overlay)overlay.classList.remove('active');mapTransitioning=false;stageClearShown=false;playStageStory();showGameToast(next.levelCode+' / SECTOR LOADED');}catch(err){if(overlay)overlay.classList.remove('active');mapTransitioning=false;stageClearShown=false;console.error('stage17 transfer failed',err);showGameToast('SECTOR TRANSFER ERROR / '+(err?.message||'retry'));}},1600);return;
     }
     if(activeStageId==='stage_17_omega'){
         if(!stage17Rush.completed||stageClearShown||mapTransitioning)return;
@@ -6419,6 +6459,7 @@ function completeStage() {
         if (stageClearShown || mapTransitioning) return;
         stageClearShown=true; mapTransitioning=true;
         const transferToken=++mapTransitionToken, def=STAGE_DEFS.final_16;
+        primeMusicForStage('final_16');
         player.vx=0; player.vy=0; for (const k in keys) keys[k]=false;
         const overlay=document.getElementById('map-transition-overlay');
         overlay.style.setProperty('--transition-accent', def.palette.accent || '#f8f6ff');
@@ -6447,6 +6488,7 @@ function completeStage() {
     const token = ++mapTransitionToken;
     grantStageClearWeapon(activeStageId);
     const idx = STAGE_ORDER.indexOf(activeStageId), nextId = STAGE_ORDER[idx + 1] || null, def = STAGE_DEFS[activeStageId];
+    if (nextId) primeMusicForStage(nextId);
     if(!nextId) { /* no generic weapon reward */ }
     player.vx = 0; for (const k in keys) keys[k] = false;
     const overlay = document.getElementById('map-transition-overlay');
@@ -6457,7 +6499,7 @@ function completeStage() {
     overlay.classList.add('active');
     setTimeout(() => {
         if (token !== mapTransitionToken) return;
-        if (nextId) { applyStagePreset(nextId, true); overlay.classList.remove('active'); playStageStory(); }
+        if (nextId) { applyStagePreset(nextId, true); syncMusic(); overlay.classList.remove('active'); playStageStory(); }
         else {
             // 最終ステージ: エンディングの物語を見せてからタイトルへ
             overlay.classList.remove('active'); mapTransitioning = false;
@@ -6944,18 +6986,26 @@ function updateStageMapProgress(){
     }
     // ボスは決戦ゲートを通過し、専用アリーナへ入った後にだけ出現する。
 }
+function getBossPhaseNumber(boss){
+    if(!boss)return 1;
+    const ratio=Math.max(0,Math.min(1,(boss.hp||0)/Math.max(1,boss.maxHp||1)));
+    if(boss.bossId==='stage_17')return ratio>.8?1:ratio>.6?2:ratio>.4?3:ratio>.2?4:5;
+    return ratio<=.5?2:1;
+}
 function updateBossHUD(){
     const el=document.getElementById('boss-hud');if(!el)return;
     const boss=enemies.find(e=>e.isBoss);
     if(!boss||!bossRuntime.active||bossRuntime.cleared){el.classList.add('hidden');return;}
     el.classList.remove('hidden');
     const def=STAGE_BOSSES[boss.bossId]||STAGE_BOSSES[activeStageId],pct=Math.max(0,Math.min(100,boss.hp/boss.maxHp*100));
-    document.getElementById('boss-hud-name').textContent=boss.bossId==='stage_17'?'SERAPHIM : TRUE ALIVE⇆TRUE DEATH':(boss.bossId==='final_16'?'Tokonagi : The Terminal Judgement':(def?.shortName||boss.bossName||'BOSS'));
-    document.getElementById('boss-hud-phase').textContent=boss.hp/boss.maxHp<=.5?'PHASE 02':'PHASE 01';
+    const phase=getBossPhaseNumber(boss),seraphim=boss.bossId==='stage_17';
+    const formColors=['#fff1a8','#facc15','#fb923c','#fb4565','#e879f9'];
+    document.getElementById('boss-hud-name').textContent=seraphim?'SERAPHIM : TRUE ALIVE⇆TRUE DEATH':(boss.bossId==='final_16'?'Tokonagi : The Terminal Judgement':(def?.shortName||boss.bossName||'BOSS'));
+    document.getElementById('boss-hud-phase').textContent=seraphim?`FORM 0${phase} / 05`:(phase===2?'PHASE 02':'PHASE 01');
     document.getElementById('boss-hud-fill').style.width=pct+'%';
-    document.getElementById('boss-hud-fill').style.background=boss.hp/boss.maxHp<=.5?'linear-gradient(90deg,#7f1d1d,#f97316,#fde68a)':`linear-gradient(90deg,#881337,${boss.bossColor||'#fb4565'},#fecdd3)`;
+    document.getElementById('boss-hud-fill').style.background=seraphim?`linear-gradient(90deg,#7f1d1d,${formColors[phase-1]},#fff1a8)`:(phase===2?'linear-gradient(90deg,#7f1d1d,#f97316,#fde68a)':`linear-gradient(90deg,#881337,${boss.bossColor||'#fb4565'},#fecdd3)`);
     document.getElementById('boss-hud-hp').textContent=`${Math.max(0,Math.ceil(boss.hp)).toLocaleString('ja-JP')} / ${boss.maxHp.toLocaleString('ja-JP')}`;
-    document.getElementById('boss-hud-state').textContent=boss.bossTelegraph>0?'ATTACK WARNING':'ENGAGED';
+    document.getElementById('boss-hud-state').textContent=boss.bossTelegraph>0?'ATTACK WARNING':(seraphim?`FORM ${phase} ACTIVE`:'ENGAGED');
 }
 function handleStage17BossDefeat(e){
     if(!stage17Rush||stage17Rush.completed)return;
@@ -7088,19 +7138,40 @@ function bossFirePattern(e, pat) {
 
 function updateBossPattern(e){
     if(!e.isBoss||!bossRuntime.active||bossRuntime.cleared)return;
-    e.bossPhase=e.hp/e.maxHp<=.5?2:1;
+    const previousPhase=e.bossPhase||1;
+    const phase=getBossPhaseNumber(e);
+    e.bossPhase=phase;
+    const isSeraphim=e.bossId==='stage_17';
+    const st=STAGE_BOSSES[e.bossId]&&STAGE_BOSSES[e.bossId].style;
+    const formColors=['#fff1a8','#facc15','#fb923c','#fb4565','#e879f9'];
+    const telegraphByForm=[27,22,18,14,10];
+    const intervalByForm=[108,78,62,47,34];
+    if(isSeraphim&&phase>previousPhase){
+        e.bossColor=formColors[phase-1];
+        e.bossPatIdx=0;
+        const formPatterns=(st&&st['p'+phase])||(st&&st.p2)||['deathNova','radial'];
+        e.bossPattern=formPatterns[0];
+        e.bossTelegraph=telegraphByForm[phase-1];
+        e.bossAttackTimer=Math.round(intervalByForm[phase-1]*((st&&st.speed)||1));
+        e.flash=18;e.alertFlash=42;
+        spawnShockwave(e.x,e.y-2,180+phase*22,5+phase*.35,380);
+        showGameToast(`SERAPHIM / FORM 0${phase} — ${['ORIGIN','AWAKENING','INVERSION','ABSOLUTE','TRUE DEATH'][phase-1]}`);
+        return;
+    }
     if(e.bossTelegraph>0){e.bossTelegraph--;if(e.bossTelegraph===0){
         const bulletStart=enemyBullets.length;bossFirePattern(e,e.bossPattern);
         if(e.bossId==='stage_17')for(let bi=bulletStart;bi<enemyBullets.length;bi++)enemyBullets[bi].bossSource='stage_17';
-        spawnShockwave(e.x,e.y-2,e.bossPhase===2?220:145,5,320);makeNoise(e.x,e.y-40,1100);
+        const shockRadius=isSeraphim?150+phase*28:(phase===2?220:145);
+        spawnShockwave(e.x,e.y-2,shockRadius,5+Math.max(0,phase-1)*.35,320);makeNoise(e.x,e.y-40,1100);
     }return;}
     e.bossAttackTimer--;
     if(e.bossAttackTimer<=0){
-        const st=STAGE_BOSSES[e.bossId]&&STAGE_BOSSES[e.bossId].style;
-        if(st){const list=e.bossPhase===2?st.p2:st.p1;e.bossPatIdx=(e.bossPatIdx||0)+1;e.bossPattern=list[e.bossPatIdx%list.length];}
-        else e.bossPattern=e.bossPhase===2?'radial':'fan';
-        e.bossTelegraph=e.bossPhase===2?18:27;
-        e.bossAttackTimer=Math.round((e.bossPhase===2?74:108)*((st&&st.speed)||1));
+        if(st){
+            const list=(st['p'+phase])||(phase>=2?st.p2:st.p1);
+            e.bossPatIdx=(e.bossPatIdx||0)+1;e.bossPattern=list[e.bossPatIdx%list.length];
+        } else e.bossPattern=phase>=2?'radial':'fan';
+        e.bossTelegraph=isSeraphim?telegraphByForm[phase-1]:(phase===2?18:27);
+        e.bossAttackTimer=Math.round((isSeraphim?intervalByForm[phase-1]:(phase===2?74:108))*((st&&st.speed)||1));
         makeNoise(e.x,e.y-40,900);
     }
 }
@@ -7228,6 +7299,8 @@ function applyStagePreset(id, reset=true, quiet=false) {
         if(gameStarted)setTimeout(()=>{if(activeStageId===id&&!bossRuntime.spawned)spawnStageBoss();},60);
     }
     if(gameStarted)showStageIntro(); else if(!quiet)showGameToast('STAGE LOADED / '+STAGE_DEFS[id].en);
+    // Keep the soundtrack aligned with the newly applied stage (including the explicit silent 0-0 state).
+    if(gameStarted && typeof syncMusic==='function')syncMusic();
 }
 
 const ATTACHMENTS = [
@@ -7391,18 +7464,44 @@ function showGameToast(message){const el=document.getElementById('game-toast');i
 function getStageNPCList(id=activeStageId){const def=STAGE_DEFS[id];return (STAGE_NPCS[id]||STAGE_NPCS[def?.family]||[]).slice();}
 // NPC会話の距離判定を描画・入力で共有する。高低差のあるマップでは縦方向を少し緩和する。
 function npcInteractionDistance(npc){const dx=Math.abs(player.x-npc.x);const npcY=groundY+(npc.dy||0);const dy=Math.abs(player.y-npcY);return {dx,dy,d:Math.hypot(dx,dy*.35)};}
-function canTalkToNPC(npc){const q=npcInteractionDistance(npc);return q.dx<=220&&q.dy<=300&&q.d<=220;}
-function nearestNPC(maxRange=220){let best=null,bd=Infinity;for(const npc of getStageNPCList()){const q=npcInteractionDistance(npc);if(q.dx>maxRange||q.dy>300)continue;if(q.d<bd){best=npc;bd=q.d;}}return bd<=maxRange?best:null;}
-function interactWithNPC(targetNpc=null){
-    // 会話中にINTERACTを押した場合は「次へ」として扱う。
-    if(menuOpen){if(menuMode==='dialogue'&&typeof advanceDialogue==='function'){advanceDialogue();return;}return;}
+function canTalkToNPC(npc){const q=npcInteractionDistance(npc);return q.dx<=320&&q.dy<=380&&q.d<=320;}
+function nearestNPC(maxRange=320){let best=null,bd=Infinity;for(const npc of getStageNPCList()){const q=npcInteractionDistance(npc);if(q.dx>maxRange||q.dy>380)continue;if(q.d<bd){best=npc;bd=q.d;}}return bd<=maxRange?best:null;}
+function performNPCInteraction(targetNpc=null){
+    // 会話中は同じボタンで次の行へ。別メニュー中は誤操作で会話を重ねない。
+    if(menuOpen){
+      if(menuMode==='dialogue'&&typeof advanceDialogue==='function'){
+        const dlgEl=document.getElementById('dialogue-overlay');
+        if(dlgEl&&!dlgEl.classList.contains('hidden')){advanceDialogue();return true;}
+      }
+      const menuElementByMode={cards:'card-menu',attachments:'attachment-menu',quests:'quest-menu',inventory:'weapon-menu',armory:'weapon-menu',dialogue:'dialogue-overlay',shop:'shop-menu',accessories:'accessory-menu',items:'items-menu'};
+      const activeMenuEl=document.getElementById(menuElementByMode[menuMode]||'');
+      // A stale menuOpen flag with no visible menu used to swallow F/INTERACT silently.
+      if(!activeMenuEl||activeMenuEl.classList.contains('hidden')){closeMenu();return performNPCInteraction(targetNpc);}
+      showGameToast('開いているメニューを閉じてから話しかけてください');
+      return false;
+    }
     const list=getStageNPCList();
-    const npc=targetNpc?(list.find(n=>n.id===targetNpc.id)||null):nearestNPC();
-    if(!npc){showGameToast('NPCに近づいてから INTERACT を押してください');return;}
-    if(!canTalkToNPC(npc)){showGameToast('NPCにもう少し近づいてください');return;}
+    const npc=targetNpc?(list.find(n=>n.id===targetNpc.id)||null):nearestNPC(320);
+    if(!npc){showGameToast('NPCが近くにいません。頭上に「F : TALK」が出る位置まで近づいてください');return false;}
+    if(!canTalkToNPC(npc)){showGameToast('NPCにもう少し近づいてください');return false;}
+    if(!npc.dlg || !npc.dlg.nodes){showGameToast('このNPCの会話データを読み込めませんでした');return false;}
     player.facing=npc.x>=player.x?1:-1;
-    openDialogue(npc);
+    const opened=openDialogue(npc);
+    if(opened===false && !menuOpen) showGameToast('会話を開始できませんでした。もう一度INTERACTを押してください');
+    return opened!==false;
 }
+// Fキーのインタラクトを最優先で受け取る。埋め込みWebView側のキー処理競合を回避。
+document.addEventListener('keydown', event => {
+    if (event.code !== 'KeyF' || event.repeat) return;
+    const t = event.target;
+    if (t && t.closest && t.closest('input,textarea,select,[contenteditable="true"]')) return;
+    if (!gameStarted || paused) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+    if (typeof window.interactWithNPC === 'function') window.interactWithNPC();
+}, true);
+
 // ---------------- 会話UI ----------------
 const STORY_SCENES = {
     ch0: {lines:['# 記録0000。試験運用兵No.00、覚醒。',
@@ -7844,11 +7943,13 @@ function dlgBegin() {
     document.getElementById('dialogue-overlay').classList.remove('hidden');
 }
 function openDialogue(npc) {
-    if (menuOpen || !npc.dlg) return;
+    if (!npc || !npc.dlg || !npc.dlg.nodes) return false;
+    if (menuOpen) return false;
     dlgBegin();
     activeDialogue = {npc, g:npc.dlg, key:null, node:null, idx:0, lines:[], sel:0, choices:null, typing:null, fxDone:false, onEnd:null};
     progressQuest('talk', 1);
     dlgEnterNode(storyState.flags['met:' + npc.id] ? 'hub' : 'hello');
+    return true;
 }
 function openScene(sceneId, onEnd) {
     const sc = STORY_SCENES[sceneId]; if (!sc || menuOpen) return false;
@@ -8255,7 +8356,11 @@ const CARD_TRAITS = [
     {id:'fortress_matrix_2',name:'要塞化Ⅱ',desc:'防御力 +55%。移動速度低下なし。',unlock:87,effects:{defPct:.55}},
     {id:'alloy_bastion',name:'合金堡塁',desc:'被ダメージをさらに11%軽減。',unlock:91,effects:{damageReduction:.11}},
     {id:'quick_kill_chain',name:'瞬間連鎖',desc:'撃破時にクイックブーストを再使用可能にする。',unlock:94,effects:{quickBoostKillReset:true}},
-    {id:'zero_point_drive',name:'零点推進機関',desc:'通常・クイックブーストの時間と速度を強化し、HP・ATK・DEFも少し上げる。',unlock:99,effects:{boostDurationPct:.12,quickBoostDurationPct:.18,boostSpeedPct:.08,quickBoostSpeedPct:.10,hpPct:.05,atkPct:.05,defPct:.05}}
+    {id:'zero_point_drive',name:'零点推進機関',desc:'通常・クイックブーストの時間と速度を強化し、HP・ATK・DEFも少し上げる。',unlock:99,effects:{boostDurationPct:.12,quickBoostDurationPct:.18,boostSpeedPct:.08,quickBoostSpeedPct:.10,hpPct:.05,atkPct:.05,defPct:.05}},
+    {id:'singularity_overdrive_125',name:'特異点過負荷',desc:'攻撃力 +12%、通常ブースト速度 +8%。',unlock:125,effects:{atkPct:.12,boostSpeedPct:.08}},
+    {id:'causal_bastion_150',name:'因果装甲核',desc:'最大HP +18%、被ダメージをさらに5%軽減。',unlock:150,effects:{hpPct:.18,damageReduction:.05}},
+    {id:'zero_lag_matrix_175',name:'無遅延演算行列',desc:'クイックブーストのクールタイム -12%、会心率 +5%。',unlock:175,effects:{quickBoostCooldownPct:.12,critChance:.05}},
+    {id:'omega_singularity_200',name:'Ω特異点機関',desc:'HP・攻撃力・防御力 +15%。研究Lv.200到達者向けの最終特性。',unlock:200,effects:{hpPct:.15,atkPct:.15,defPct:.15}}
 ];
 const CARD_STACKABLE_TRAITS = new Set(['boost_duration_1','boost_cooldown_1','quick_boost_1','quick_recovery_1','overthrust','burst_drive','zero_lag','singularity_thruster','attack_1','defense_1','range_1','crit_1','vital_1','vital_2','attack_2','defense_2','mobility_1','mobility_2','life_steal','steady_aim','overdrive','desperation','executioner','regeneration','shock_guard','precision_2','balanced','berserker','fortified','critical_overload','suppressor','reaper','singularity']);
 for (const trait of CARD_TRAITS) if (CARD_STACKABLE_TRAITS.has(trait.id)) trait.stackable = true;
@@ -8280,7 +8385,7 @@ const CARD_BLUEPRINTS = [
     {id:'vector_drive',name:'ベクトル・ドライブ',stage:6,unlock:35,stats:{hp:2400,atk:2350,def:2250},symbol:'V',shape:['######','######','..##..','######','######'],effects:[{x:1,y:0,type:'atk'},{x:4,y:0,type:'crit'},{x:2,y:2,type:'trait'},{x:2,y:4,type:'def'}],desc:'推進器特性との相性を想定した高機動カード。',art:'vector_drive.webp'},
     {id:'chronos_core',name:'クロノス・コア',stage:6,unlock:60,stats:{hp:3200,atk:2900,def:3400},symbol:'C',shape:['######','##..##','######','##..##','######'],effects:[{x:1,y:0,type:'hp'},{x:4,y:1,type:'atk'},{x:2,y:2,type:'trait'},{x:4,y:3,type:'def'}],desc:'ブースト回転率と生存性を高める終盤向けカード。',art:'chronos_core.webp'},
     {id:'event_horizon',name:'イベント・ホライズン',stage:6,unlock:80,stats:{hp:4300,atk:3900,def:4200},symbol:'EH',shape:['######','######','######','######','######'],effects:[{x:0,y:0,type:'hp'},{x:5,y:0,type:'atk'},{x:1,y:2,type:'crit'},{x:4,y:2,type:'trait'},{x:0,y:4,type:'def'},{x:5,y:4,type:'trait'}],desc:'研究Lv.80以降の最終装備候補。高出力パーツと複数特性で真価を発揮。',art:'event_horizon.webp'},
-    {id:'zero_point_array',name:'零点演算配列',stage:6,unlock:100,stats:{hp:5600,atk:5200,def:5900},symbol:'0',shape:['######','######','######','######','######'],effects:[{x:0,y:0,type:'hp'},{x:5,y:0,type:'atk'},{x:1,y:2,type:'crit'},{x:4,y:2,type:'trait'},{x:0,y:4,type:'def'},{x:5,y:4,type:'trait'}],desc:'研究Lv.100で解禁される究極カード。零点領域の攻略用に設計された。',art:'zero_point_array.webp'}
+    {id:'zero_point_array',name:'零点演算配列',stage:6,unlock:100,stats:{hp:5600,atk:5200,def:5900},symbol:'0',shape:['######','######','######','######','######'],effects:[{x:0,y:0,type:'hp'},{x:5,y:0,type:'atk'},{x:1,y:2,type:'crit'},{x:4,y:2,type:'trait'},{x:0,y:4,type:'def'},{x:5,y:4,type:'trait'}],desc:'研究Lv.100で解禁される究極カード。研究Lv.200へ向かう零点領域の基幹設計。',art:'zero_point_array.webp'}
 ];
 // 研究レベルの途中で設計図が途切れないよう、細かな解禁段階を追加する。
 const CARD_PROGRESS_BLUEPRINT_DATA = [
@@ -8290,7 +8395,12 @@ const CARD_PROGRESS_BLUEPRINT_DATA = [
     [38,'ベクトル分配器','V'],[42,'防壁再構成板','W'],[48,'過推力コンバーター','T'],[52,'再生ナノセル','N'],
     [58,'高密度弾道核','B'],[64,'時間差演算装置','C'],[68,'冷却位相モジュール','I'],[74,'多重防御アレイ','M'],
     [76,'連鎖反応セル','X'],[84,'特異点予備核','S'],[88,'零域展開板','Z'],[92,'因果分岐演算器','F'],
-    [96,'終端制御コア','E'],[98,'無憂式・試製配列','U']
+    [96,'終端制御コア','E'],[98,'無憂式・試製配列','U'],
+    [105,'零域推進アレイ','ZA'],[110,'因果反転コイル','CR'],[115,'超臨界装甲核','SA'],[120,'位相共鳴機関','PR'],
+    [125,'特異点過負荷炉','SO'],[130,'終端収束レンズ','TL'],[135,'虚数防壁セル','IW'],[140,'連鎖演算炉','CO'],
+    [145,'境界突破コア','BC'],[150,'因果装甲核','CA'],[155,'永久機関フレーム','PF'],[160,'宇宙熱力学核','UT'],
+    [165,'超越加速モジュール','AM'],[170,'零遅延砲心','ZC'],[175,'無遅延演算行列','ZM'],[180,'虚空収束結晶','VC'],
+    [185,'終局防衛回路','ED'],[190,'全域最適化核','AO'],[195,'無限並列炉','IP'],[200,'Ω零点演算配列','Ω0']
 ];
 const CARD_PROGRESS_SHAPES = [
     ['######','##..##','######','..##..','######'],
@@ -8308,6 +8418,33 @@ CARD_BLUEPRINTS.push(...CARD_PROGRESS_BLUEPRINT_DATA.map(([level,name,symbol],i)
     if(level>=60&&i%3===0)effects.push({x:3,y:2,type:'trait'});
     return {id:'progress_lv_'+level,name,stage,unlock:level,recipeLevel:level,stats:{hp,atk,def},symbol,shape,effects,desc:`研究Lv.${level}で解禁。基礎性能と効果マスの組み合わせを細かく調整した段階別設計図。`,art:`progress_lv_${level}.webp`};
 }));
+
+// Blueprint effect slots must sit on visible/usable cells (#), never in the dotted-outside area.
+// Older blueprint definitions contained effect coordinates on '.' cells, which rendered as buffs outside the frame.
+for (const bp of CARD_BLUEPRINTS) {
+    const usedEffectCells = new Set();
+    const validCells = [];
+    for (let y = 0; y < bp.shape.length; y++) {
+        for (let x = 0; x < bp.shape[y].length; x++) {
+            if (bp.shape[y][x] === '#') validCells.push({x,y});
+        }
+    }
+    for (const effect of (bp.effects || [])) {
+        const key = effect.x + ',' + effect.y;
+        if (bp.shape[effect.y]?.[effect.x] === '#' && !usedEffectCells.has(key)) {
+            usedEffectCells.add(key);
+            continue;
+        }
+        const target = validCells
+            .filter(cell => !usedEffectCells.has(cell.x + ',' + cell.y))
+            .sort((a,b) => (Math.abs(a.x-effect.x)+Math.abs(a.y-effect.y)) - (Math.abs(b.x-effect.x)+Math.abs(b.y-effect.y)) || a.y-b.y || a.x-b.x)[0];
+        if (target) {
+            effect.x = target.x;
+            effect.y = target.y;
+            usedEffectCells.add(target.x + ',' + target.y);
+        }
+    }
+}
 
 // trait特殊マスが対応パーツで埋まると、設計図段階に応じた特性を選択候補に追加する。
 for (const [bpIndex, bp] of CARD_BLUEPRINTS.entries()) {
@@ -8394,7 +8531,7 @@ function loadCardProgress() {
         const saved = JSON.parse(localStorage.getItem('muyuu-card-system-v1') || 'null');
         if (!saved || saved.version !== 1) return;
         cardState.xp = Math.max(0, Number(saved.xp) || 0);
-        cardState.level = Math.max(1, Math.min(100, Number(saved.level) || 1));
+        cardState.level = Math.max(1, Math.min(200, Number(saved.level) || 1));
         cardState.nextUid = Math.max(1, Number(saved.nextUid) || 1);
         cardState.money = Math.max(0, Math.floor(Number(saved.money) || 0));
         cardState.invBonus = Math.max(0, Math.min(20, Math.floor(Number(saved.invBonus) || 0)));
@@ -8508,13 +8645,17 @@ function getDraftOccupancy(draft, excludeUid=null) {
 }
 function evaluateCardDraft(draft) {
     const bp=cardBlueprint(draft?.blueprintId||selectedBlueprintId);
-    const placements=(draft?.placements||[]).filter(pl=>cardState.parts.some(p=>p.uid===pl.uid));
-    const map=getDraftOccupancy({placements});
-    let outOfBounds=false;
-    for(const pl of placements) {
+    const allPlacements=(draft?.placements||[]).filter(pl=>cardState.parts.some(p=>p.uid===pl.uid));
+    const invalidPlacements=[];
+    for(const pl of allPlacements) {
         const p=cardState.parts.find(a=>a.uid===pl.uid);
-        for(const [x,y] of makePieceCells(p,pl.x,pl.y,pl.rot,pl.mirror)) if(!boardCellAllowed(bp,x,y)) outOfBounds=true;
+        if(!p || makePieceCells(p,pl.x,pl.y,pl.rot,pl.mirror).some(([x,y])=>!boardCellAllowed(bp,x,y))) invalidPlacements.push(pl);
     }
+    const outOfBounds=invalidPlacements.length>0;
+    // Invalid/outside pieces are not used in output averaging, bonuses, or card stat calculation.
+    const invalidUids=new Set(invalidPlacements.map(pl=>pl.uid));
+    const placements=allPlacements.filter(pl=>!invalidUids.has(pl.uid));
+    const map=getDraftOccupancy({placements});
     let overlaps=0;
     for(const entries of map.values()) if(entries.length>1) overlaps++;
     // パーツ単位の連結成分。重なり・上下左右の隣接は同じ塊として扱う。
@@ -8554,13 +8695,13 @@ function evaluateCardDraft(draft) {
         atk:Math.max(0,Math.round((bp.stats.atk*levelMult+mods.atk)*outputMult*penaltyMult*bonusMult)),
         def:Math.max(0,Math.round((bp.stats.def*levelMult+mods.def)*outputMult*penaltyMult*bonusMult))
     };
-    return {bp,placements,parts,outOfBounds,overlaps,isolation,components,penalties,outputAvg,outputMult,mods,occupiedEffects,effectPartSets,bonusMult,bonuses,levelMult,penaltyMult,stats,craftable:parts.length>0&&penalties<3&&stats.atk>=1&&stats.def>=1&&cardState.cards.length<CARD_INV_CAP(cardState.level)};
+    return {bp,placements,parts,outOfBounds,overlaps,isolation,components,penalties,outputAvg,outputMult,mods,occupiedEffects,effectPartSets,bonusMult,bonuses,levelMult,penaltyMult,stats,craftable:parts.length>0&&!outOfBounds&&penalties<3&&stats.atk>=1&&stats.def>=1&&cardState.cards.length<CARD_INV_CAP(cardState.level)};
 }
 function addCraftXP(amount) {
-    if (cardState.level >= 100) return;
+    if (cardState.level >= 200) return;
     const beforeLevel=cardState.level;
     cardState.xp+=Math.max(0,Math.floor(amount));
-    while(cardState.level<100 && cardState.xp>=CARD_XP_NEXT(cardState.level)) { cardState.xp-=CARD_XP_NEXT(cardState.level);cardState.level++; }
+    while(cardState.level<200 && cardState.xp>=CARD_XP_NEXT(cardState.level)) { cardState.xp-=CARD_XP_NEXT(cardState.level);cardState.level++; }
     const gained=cardState.level-beforeLevel;
     if(gained>0) for(const card of cardState.cards) for(let i=0;i<gained;i++) for(const stat of ['hp','atk','def']) card.stats[stat]=Math.round(card.stats[stat]*1.01);
     saveCardProgress();
@@ -8587,6 +8728,13 @@ function placeSelectedPart(x,y) {
     const temp={placements:craftDraft.placements.filter(pl=>pl.uid!==uid)};
     const occ=getDraftOccupancy(temp);
     const cells=makePieceCells(part,x,y,craftDraft.pendingRot,craftDraft.pendingMirror);
+    const bp=cardBlueprint(craftDraft.blueprintId);
+    // No piece may sit outside the actual blueprint shape (including '.' cells and beyond the board edges).
+    if(cells.some(([cx,cy])=>!boardCellAllowed(bp,cx,cy))) {
+        craftDraft.cursorX=x; craftDraft.cursorY=y;
+        cardMessage='配置できません：点線・枠外のマスにはパーツを置けません。移動ボタンで黄色の配置先を調整してください。';
+        renderCardSystem(); return;
+    }
     // 1マス4パーツ以上は禁止。既存配置を除いた上で検証。
     if(cells.some(([cx,cy])=>(occ.get(cx+','+cy)||[]).length>=3)) { cardMessage='1マスに4パーツ以上は重ねられません。'; renderCardSystem(); return; }
     const old=craftDraft.placements.find(p=>p.uid===uid);
@@ -8671,8 +8819,8 @@ function cardStatMarkup(stats) { return `<div class="card-stat-row"><div class="
 function cardTraitNames(ids) { return (ids||[]).map(id=>CARD_TRAIT_BY_ID[id]?.name||id); }
 // ===================== パーツ倉庫 / 売却 / ショップ =====================
 const PART_SHAPE_NAMES = {dot:'ドット', domino:'ドミノ', triLine:'直線3', triL:'L3', square:'正方形', L:'L字', T:'T字', S:'S字', J:'J字', longL:'長L字', cross:'十字', zig:'ジグ'};
-const PART_SORTS = {new:'新しい順', old:'古い順', out_desc:'出力が高い順', out_asc:'出力が低い順', kind:'種類順', shape:'形状順', trait:'特性ありを先頭', value:'売値が高い順'};
-const partView = {sort:'new', kind:'all', trait:'all', shape:'all', lock:'all', minOut:0, page:0, pageSize:48, sel:new Set(), bulkBelow:300};
+const PART_SORTS = {kind:'色別（パーツ種類）', new:'新しい順', old:'古い順', out_desc:'出力が高い順', out_asc:'出力が低い順', shape:'形状順', trait:'特性ありを先頭', value:'売値が高い順'};
+const partView = {sort:'kind', kind:'all', trait:'all', shape:'all', lock:'all', minOut:0, page:0, pageSize:48, sel:new Set(), bulkBelow:300};
 function partSellValue(p) { let v = Math.floor((p.output || 0) * .08); if (p.trait) v = Math.floor(v * 1.4) + 20; return Math.max(1, v); }
 function cardSellValue(c) {
     const s = c.stats || {hp:0, atk:0, def:0};
@@ -8711,11 +8859,11 @@ function partFilterBarMarkup(full) {
 function partTileInner(p) {
     const t = CARD_PART_TYPES[p.kind];
     return '<span class="part-glyph">' + t.glyph + '</span><span class="part-copy"><b>' + t.name + (p.locked ? ' 🔒' : '') + '</b>出力 ' + p.output.toLocaleString('ja-JP')
-        + (p.trait && CARD_TRAIT_BY_ID[p.trait] ? '<br>' + CARD_TRAIT_BY_ID[p.trait].name : '') + '<br>' + (PART_SHAPE_NAMES[p.shape] || p.shape) + '</span>';
+        + '<span class="part-color-label">● ' + t.name + '系</span>' + (p.trait && CARD_TRAIT_BY_ID[p.trait] ? '<br>' + CARD_TRAIT_BY_ID[p.trait].name : '') + '<br>' + (PART_SHAPE_NAMES[p.shape] || p.shape) + '</span>';
 }
 // クラフト盤のパーツ一覧: 配置中を先頭に固定し、残りはフィルタ/並び順に従って最大120件
 function renderPartPaletteItems(draft, placedSet) {
-    const list = sortedFilteredParts(), placed = cardState.parts.filter(p => placedSet.has(p.uid));
+    const list = sortedFilteredParts(), placed = cardState.parts.filter(p => placedSet.has(p.uid)).sort((a,b)=>Object.keys(CARD_PART_TYPES).indexOf(a.kind)-Object.keys(CARD_PART_TYPES).indexOf(b.kind)||b.output-a.output);
     const rest = list.filter(p => !placedSet.has(p.uid)), LIMIT = 120;
     const shown = placed.concat(rest.slice(0, LIMIT));
     let html = shown.map(p => '<button type="button" draggable="true" class="part-piece ' + (draft.selectedPartUid === p.uid ? 'selected' : '') + ' ' + (placedSet.has(p.uid) ? 'placed' : '')
@@ -8898,12 +9046,12 @@ function handleEconomyClick(el) {
 }
 
 function renderCardOverview() {
-    const cap=CARD_INV_CAP(cardState.level), next=CARD_XP_NEXT(cardState.level), progress=cardState.level>=100?100:100*cardState.xp/next;
+    const cap=CARD_INV_CAP(cardState.level), next=CARD_XP_NEXT(cardState.level), progress=cardState.level>=200?100:100*cardState.xp/next;
     const cards=cardState.cards;
     const chosen=cardInstance(selectedCardUid)||cards[cards.length-1]||null;
     return `<div class="card-layout"><div class="card-section"><div class="card-section-title">OWNED CARDS / 所持カード ${cards.length} / ${cap}</div>
         ${cards.length?`<div class="card-grid">${cards.map(c=>{const bp=cardBlueprint(c.blueprintId);return `<button type="button" class="card-tile ${chosen?.uid===c.uid?'selected':''}" data-card-select="${c.uid}" style="--tier-color:${CARD_COLORS[c.stage]}">${cardArtMarkup(bp)}<div class="card-tile-name">${c.name}</div><div class="card-tile-meta">段階 ${c.stage} / 出力平均 ${c.outputAvg}</div><div class="card-tags"><span class="card-tag">HP +${c.stats.hp.toLocaleString('ja-JP')}</span><span class="card-tag">ATK +${c.stats.atk.toLocaleString('ja-JP')}</span><span class="card-tag">DEF +${c.stats.def.toLocaleString('ja-JP')}</span>${cardState.equipped.includes(c.uid)?'<span class="card-tag good">装備中</span>':''}</div></button>`}).join('')}</div>`:`<div class="card-empty">まだカードを所持していません。<br>敵からパーツを集め、「クラフトパズル」で設計図を完成させよう。</div>`}
-        </div><aside class="card-section"><div class="card-section-title">CRAFT RESEARCH / クラフト研究</div><div class="card-row"><b>LEVEL ${cardState.level}</b><span class="card-muted">最大 Lv.100</span></div><div class="card-progress"><i style="width:${progress}%"></i></div><div class="card-inline"><span>経験値</span><b>${cardState.xp} / ${cardState.level>=100?'MAX':next}</b></div><div class="card-inline"><span>装備カード</span><b>${cardState.equipped.length} / 6</b></div><div class="card-inline"><span>所持パーツ</span><b>${cardState.parts.length.toLocaleString('ja-JP')} (上限なし)</b></div><div class="card-inline"><span>所持金</span><b>${cardState.money.toLocaleString('ja-JP')} G</b></div><div class="card-inline"><span>所持カード上限</span><b>${cards.length} / ${cap}</b></div><p class="card-muted">研究レベルで設計図・高段階カード・特性・所持上限が解禁されます。研究Lvごとにカード基礎値も1%ずつ上昇します。</p>
+        </div><aside class="card-section"><div class="card-section-title">CRAFT RESEARCH / クラフト研究</div><div class="card-row"><b>LEVEL ${cardState.level}</b><span class="card-muted">最大 Lv.200</span></div><div class="card-progress"><i style="width:${progress}%"></i></div><div class="card-inline"><span>経験値</span><b>${cardState.xp} / ${cardState.level>=200?'MAX':next}</b></div><div class="card-inline"><span>装備カード</span><b>${cardState.equipped.length} / 6</b></div><div class="card-inline"><span>所持パーツ</span><b>${cardState.parts.length.toLocaleString('ja-JP')} (上限なし)</b></div><div class="card-inline"><span>所持金</span><b>${cardState.money.toLocaleString('ja-JP')} G</b></div><div class="card-inline"><span>所持カード上限</span><b>${cards.length} / ${cap}</b></div><p class="card-muted">研究レベルで設計図・高段階カード・特性・所持上限が解禁されます。研究Lvごとにカード基礎値も1%ずつ上昇します。</p>
         ${chosen?`<div class="card-section-title" style="margin-top:16px">SELECTED CARD / 選択中</div>${cardArtMarkup(cardBlueprint(chosen.blueprintId))}<div class="card-tile-name">${chosen.name}</div><div class="card-muted">段階 ${chosen.stage} · 平均出力 ${chosen.outputAvg} · ペナルティ ${chosen.penalties}</div>${cardStatMarkup(chosen.stats)}<div class="card-muted">${chosen.traits.length?'特性：'+cardTraitNames(chosen.traits).join(' / '):'特性なし'}</div><div class="card-row" style="margin-top:10px"><button class="card-btn primary" type="button" data-card-equip="${chosen.uid}">${cardState.equipped.includes(chosen.uid)?'装備解除':'装備する'}</button><button class="card-btn danger" type="button" data-card-sell="${chosen.uid}" ${cardState.equipped.includes(chosen.uid)?'disabled':''}>売却 ${cardSellValue(chosen).toLocaleString('ja-JP')} G</button><span class="card-muted">装備は最大6枚・同一設計図は1枚まで</span></div>`:`<p class="card-muted">カードを作成するとここに能力値が表示されます。</p>`}</aside></div>`;
 }
 function renderEquippedCards() {
@@ -8924,17 +9072,19 @@ function renderCraftBoard(ev) {
     if(selected) for(const [x,y] of ghost) {const key=x+','+y;const a=(candidateMap.get(key)||[]).slice();a.push({part:selected,pl:null,x,y,ghost:true});candidateMap.set(key,a);}
     const board=bp.shape.map((row,y)=>row.split('').map((cell,x)=>{
         const allowed=cell==='#';const eff=bp.effects.find(e=>e.x===x&&e.y===y);const entries=candidateMap.get(x+','+y)||[];
-        const isGhost=ghostSet.has(x+','+y);const invalid=isGhost&&entries.length>1;
-        const cls=['craft-cell',allowed?'':'void',eff?'effect-'+eff.type:'',isGhost?'ghost':'',invalid?'invalid':''].filter(Boolean).join(' ');
+        const isGhost=ghostSet.has(x+','+y);const invalid=isGhost&&(!allowed||entries.length>1);
+        const isCursor=x===draft.cursorX&&y===draft.cursorY;
+        const cls=['craft-cell',allowed?'':'void',eff?'effect-'+eff.type:'',isGhost?'ghost':'',isCursor?'cursor-cell':'',invalid?'invalid':''].filter(Boolean).join(' ');
         const label=eff?`<span class="cell-effect">${CARD_SPECIAL_LABEL[eff.type]}</span>`:'';
-        const shown=entries[0];let piece='';if(shown){piece=`<span class="cell-part ${eff&&shown.part.kind===eff.type?'match':''}" style="--part-color:${CARD_PART_TYPES[shown.part.kind].color};${isGhost?'opacity:.6;border:1px dashed #fef08a':''}">${CARD_PART_TYPES[shown.part.kind].glyph}</span>`;}
-        return `<button type="button" class="${cls}" data-board-cell="1" data-x="${x}" data-y="${y}" title="${eff?'特殊マス：'+CARD_PART_TYPES[eff.type].name:allowed?'盤面':'盤面形状外'}">${label}${piece}${entries.length>1?`<span class="cell-count">×${entries.length}</span>`:''}</button>`;
+        const shown=(isGhost&&entries.find(e=>e.ghost))||entries[0];let piece='';if(shown){const ghostPart=!!shown.ghost;piece=`<span class="cell-part ${eff&&shown.part.kind===eff.type?'match':''} ${ghostPart?'ghost-part':''} ${draft.selectedPartUid===shown.part.uid?'active-piece':''}" style="--part-color:${CARD_PART_TYPES[shown.part.kind].color}">${CARD_PART_TYPES[shown.part.kind].glyph}</span>`;}
+        const cursorMark=isCursor&&!isGhost?'<span class="craft-cursor-mark">⌖</span>':'';
+        return `<button type="button" class="${cls}" data-board-cell="1" data-x="${x}" data-y="${y}" title="${eff?'特殊マス：'+CARD_PART_TYPES[eff.type].name:allowed?'盤面':'盤面形状外'}">${label}${piece}${cursorMark}${entries.length>1?`<span class="cell-count">×${entries.length}</span>`:''}</button>`;
     }).join('')).join('');
     const placedSet=new Set(draft.placements.map(p=>p.uid));
     const availableForChoice=getAvailableCraftTraits(ev);
     const traitSelection=draft.traitSelection===null?availableForChoice.slice(0,3).map((id,i)=>id+'#'+i):draft.traitSelection;
     const traitChoices=availableForChoice.map((id,i)=>{const key=id+'#'+i;return `<label class="craft-trait"><input type="checkbox" data-craft-trait="${id}" data-craft-trait-key="${key}" ${traitSelection.includes(key)?'checked':''}><span><b>${CARD_TRAIT_BY_ID[id].name}</b> — ${CARD_TRAIT_BY_ID[id].desc}</span></label>`}).join('');
-    return `<div class="craft-layout"><div class="card-section"><div class="card-section-title">CRAFT BOARD / ${bp.name} · 段階 ${bp.stage}</div><p class="card-muted">スマホ：パーツをタップして選択 → 盤面の置きたいマスをタップ。配置済みパーツもパレットから選び直して移動できます。PC：パーツをドラッグ＆ドロップ、または矢印キーで位置を調整。回転・ミラー・配置は下のボタンから操作できます（PCは R / F / Enter も対応）。特殊マスは対応する種類のパーツで埋めると効果を発揮します。</p><div class="craft-board">${board}</div><div class="card-row" style="justify-content:center;margin-top:10px"><button class="card-small-btn" data-craft-rotate type="button">回転 [R]</button><button class="card-small-btn" data-craft-mirror type="button">ミラー [F]</button><button class="card-small-btn" data-craft-place type="button">配置 [Enter]</button><button class="card-small-btn" data-craft-remove type="button">選択パーツを戻す [Backspace]</button></div><div class="card-message" style="border-color:${ev.penalties>=3?'#fb7185':'#fbbf24'}">ペナルティ：${ev.penalties}（範囲外 ${ev.outOfBounds?1:0} / 重複 ${ev.overlaps} / 隔離 ${ev.isolation}）。ペナルティ0＝100%、1＝67%、2＝34%、3以上＝クラフト不可。${cardMessage?'<br>'+cardMessage:''}</div><div class="craft-preview"><div class="card-section-title">CRAFT CALCULATION / 計算プレビュー</div><div class="card-inline"><span>配置パーツ数</span><b>${ev.parts.length}</b></div><div class="card-inline"><span>出力値平均</span><b>${ev.outputAvg.toFixed(1)} → ×${ev.outputMult.toFixed(2)}</b></div><div class="card-inline"><span>クラフトLv補正</span><b>×${ev.levelMult.toFixed(2)}</b></div><div class="card-inline"><span>ペナルティ補正</span><b>×${ev.penaltyMult.toFixed(2)}</b></div><div class="card-inline"><span>ボーナス補正</span><b>×${ev.bonusMult.toFixed(2)}</b></div>${cardStatMarkup(ev.stats)}<div class="card-muted">効果マスの一致ボーナス：HP +${ev.mods.hp} / ATK +${ev.mods.atk} / DEF +${ev.mods.def} / 会心率 +${Math.round(ev.mods.critChance*100)}%</div>${ev.bonuses.map(b=>`<div class="card-tag good">${b}</div>`).join('')}<div class="card-muted" style="margin-top:8px">最終条件：ATK ≥ 1 かつ DEF ≥ 1、ペナルティ2以下、パーツ1個以上。最大出力値は999999。</div></div></div>
+    return `<div class="craft-layout"><div class="card-section"><div class="card-section-title">CRAFT BOARD / ${bp.name} · 段階 ${bp.stage}</div><p class="card-muted">スマホ：パーツをタップして選択 → 盤面をタップ、または下の矢印で配置先を1マスずつ移動 →「配置」。黄色は配置プレビュー、青白い照準は配置先です。点線・枠外には置けません。配置済みパーツはパレットから選び直すと移動できます。PC：ドラッグ＆ドロップ／矢印キー、Rで回転、Fでミラー、Enterで配置。</p><div class="craft-board">${board}</div><div class="craft-nudge-controls" aria-label="配置先を1マス移動"><button class="card-small-btn" data-craft-move="0,-1" type="button" aria-label="上へ1マス">▲</button><button class="card-small-btn" data-craft-move="-1,0" type="button" aria-label="左へ1マス">◀</button><button class="card-small-btn" data-craft-move="0,1" type="button" aria-label="下へ1マス">▼</button><button class="card-small-btn" data-craft-move="1,0" type="button" aria-label="右へ1マス">▶</button><span class="craft-cursor-status">配置先 X:${draft.cursorX+1} / Y:${draft.cursorY+1}</span></div><div class="card-row" style="justify-content:center;margin-top:10px"><button class="card-small-btn" data-craft-rotate type="button">回転 [R]</button><button class="card-small-btn" data-craft-mirror type="button">ミラー [F]</button><button class="card-small-btn" data-craft-place type="button">配置 [Enter]</button><button class="card-small-btn" data-craft-remove type="button">選択パーツを戻す [Backspace]</button></div><div class="card-message" style="border-color:${ev.outOfBounds||ev.penalties>=3?'#fb7185':'#fbbf24'}">ペナルティ：${ev.penalties}（範囲外 ${ev.outOfBounds?1:0} / 重複 ${ev.overlaps} / 隔離 ${ev.isolation}）。枠外のパーツは能力計算から除外され、枠外配置が残っている間はクラフト不可。${cardMessage?'<br>'+cardMessage:''}</div><div class="craft-preview"><div class="card-section-title">CRAFT CALCULATION / 計算プレビュー</div><div class="card-inline"><span>配置パーツ数</span><b>${ev.parts.length}</b></div><div class="card-inline"><span>出力値平均</span><b>${ev.outputAvg.toFixed(1)} → ×${ev.outputMult.toFixed(2)}</b></div><div class="card-inline"><span>クラフトLv補正</span><b>×${ev.levelMult.toFixed(2)}</b></div><div class="card-inline"><span>ペナルティ補正</span><b>×${ev.penaltyMult.toFixed(2)}</b></div><div class="card-inline"><span>ボーナス補正</span><b>×${ev.bonusMult.toFixed(2)}</b></div>${cardStatMarkup(ev.stats)}<div class="card-muted">効果マスの一致ボーナス：HP +${ev.mods.hp} / ATK +${ev.mods.atk} / DEF +${ev.mods.def} / 会心率 +${Math.round(ev.mods.critChance*100)}%</div>${ev.bonuses.map(b=>`<div class="card-tag good">${b}</div>`).join('')}<div class="card-muted" style="margin-top:8px">最終条件：ATK ≥ 1 かつ DEF ≥ 1、ペナルティ2以下、パーツ1個以上。最大出力値は999999。</div></div></div>
     <aside class="card-section"><div class="card-section-title">PARTS / パーツ倉庫 ${cardState.parts.length.toLocaleString('ja-JP')} 個</div>${partFilterBarMarkup(false)}<div class="part-palette">${renderPartPaletteItems(draft,placedSet)}</div><div class="card-message" style="margin-top:10px;border-color:#38bdf8">選択中：${selected?CARD_PART_TYPES[selected.kind].name+' / 出力 '+selected.output:'なし'}<br>パーツ種類と出力値が完成カードの能力に反映されます。盤面外にはみ出したマスもペナルティ判定に含まれます。</div><div class="craft-traits"><div class="card-section-title">TRAIT SELECTION / 特性選択（最大3）</div>${traitChoices||'<div class="card-muted">配置パーツに特性はありません。</div>'}</div><button class="card-btn primary" data-craft-finish type="button" style="width:100%;margin-top:12px" ${ev.craftable?'':'disabled'}>カードをクラフト</button><button class="card-btn" data-craft-cancel type="button" style="width:100%;margin-top:7px">設計図選択へ戻る</button></aside></div>`;
 }
 function renderCraftView() {
@@ -8959,13 +9109,20 @@ function openCardSystem() {
     if(menuWasPlaying)gsap.globalTimeline.pause();for(const k in keys)keys[k]=false;
     document.body.classList.add('menu-overlay-open');cardRoot.classList.remove('hidden');renderCardSystem();syncMusic();
 }
+function moveCraftCursor(dx,dy) {
+    if(!craftDraft)return;
+    const bp=cardBlueprint(craftDraft.blueprintId);
+    craftDraft.cursorX=Math.max(0,Math.min(5,craftDraft.cursorX+dx));
+    craftDraft.cursorY=Math.max(0,Math.min(bp.shape.length-1,craftDraft.cursorY+dy));
+    cardMessage='';renderCardSystem();
+}
 function cardMenuKey(code) {
     if(code==='Escape'||code==='Tab'){closeMenu();return;}
     if(cardView!=='craft'||!craftDraft)return;
-    if(code==='ArrowLeft'){craftDraft.cursorX=Math.max(-2,craftDraft.cursorX-1);renderCardSystem();}
-    else if(code==='ArrowRight'){craftDraft.cursorX=Math.min(5,craftDraft.cursorX+1);renderCardSystem();}
-    else if(code==='ArrowUp'){craftDraft.cursorY=Math.max(-2,craftDraft.cursorY-1);renderCardSystem();}
-    else if(code==='ArrowDown'){craftDraft.cursorY=Math.min(4,craftDraft.cursorY+1);renderCardSystem();}
+    if(code==='ArrowLeft'){moveCraftCursor(-1,0);}
+    else if(code==='ArrowRight'){moveCraftCursor(1,0);}
+    else if(code==='ArrowUp'){moveCraftCursor(0,-1);}
+    else if(code==='ArrowDown'){moveCraftCursor(0,1);}
     else if(code==='KeyR')rotateSelectedDraftPart();
     else if(code==='KeyF')mirrorSelectedDraftPart();
     else if(code==='Enter'||code==='Space')placeSelectedPart(craftDraft.cursorX,craftDraft.cursorY);
@@ -8984,6 +9141,7 @@ cardContent.addEventListener('click',ev=>{
     if(el.dataset.craftBlueprint){startCraftDraft(el.dataset.craftBlueprint);return;}
     if(el.dataset.partSelect){selectDraftPart(el.dataset.partSelect);return;}
     if(el.dataset.boardCell){const x=Number(el.dataset.x),y=Number(el.dataset.y);craftDraft.cursorX=x;craftDraft.cursorY=y;if(craftDraft.selectedPartUid)placeSelectedPart(x,y);else renderCardSystem();return;}
+    if(el.dataset.craftMove){const [dx,dy]=el.dataset.craftMove.split(',').map(Number);moveCraftCursor(dx,dy);return;}
     if(el.hasAttribute('data-craft-rotate')){rotateSelectedDraftPart();return;}
     if(el.hasAttribute('data-craft-mirror')){mirrorSelectedDraftPart();return;}
     if(el.hasAttribute('data-craft-place')){placeSelectedPart(craftDraft?.cursorX,craftDraft?.cursorY);return;}
@@ -12698,11 +12856,12 @@ requestAnimationFrame(loop);
     if (!root || root.dataset.inputBound === 'true') return;
     root.dataset.inputBound = 'true';
 
-    const mapping = {left:'left',right:'right',up:'up',down:'down',z:'z',x:'x',f:'f',i:'i',escape:'escape'};
+    const mapping = {left:'left',right:'right',up:'up',down:'down',z:'z',x:'x',e:'e',shift:'shift',f:'f',i:'i',escape:'escape'};
     const held = new Map();
     function press(name, on) {
       // UI actions (NPC / card / inventory / pause) must work even if the gameplay key map is not ready yet.
       if (name === 'charge') { if (!window.keys) return; window.keys.z = on; window.keys.c = on; return; }
+      if (name === 'shift') { if (window.keys) window.keys.shift = on; return; }
       if (name === 'f') {
         if (on && typeof window.interactWithNPC === 'function') window.interactWithNPC();
         return;
@@ -12785,6 +12944,29 @@ requestAnimationFrame(loop);
     root.addEventListener('contextmenu', stopBrowserGesture, {capture:true, passive:false});
     root.addEventListener('selectstart', stopBrowserGesture, {capture:true, passive:false});
     root.addEventListener('dragstart', stopBrowserGesture, {capture:true, passive:false});
+    // Keep CHARGE visible only for Archange; this is based on the live weapon HUD.
+    const chargeBtn = document.getElementById('muyuu-charge-button');
+    const weaponLabel = document.getElementById('ui-weapon');
+    const syncCharge = () => {
+      if (!chargeBtn) return;
+      const activeWeapon = (weaponLabel && weaponLabel.textContent || '').toLowerCase();
+      chargeBtn.hidden = !activeWeapon.includes('archange');
+    };
+    syncCharge();
+    if (weaponLabel && window.MutationObserver) new MutationObserver(syncCharge).observe(weaponLabel, {childList:true,characterData:true,subtree:true});
+    // Dynamically place pause directly below the upper-left HUD instead of in the action cluster.
+    const pauseBtn = document.getElementById('muyuu-mobile-pause');
+    const hud = document.getElementById('hud-top-left');
+    const placePause = () => {
+      if (!pauseBtn || !hud) return;
+      const r = hud.getBoundingClientRect();
+      const top = Math.max(8, Math.min(window.innerHeight - pauseBtn.offsetHeight - 8, r.bottom + 8));
+      document.documentElement.style.setProperty('--muyuu-pause-top', top + 'px');
+      pauseBtn.style.left = Math.max(8, r.left) + 'px';
+    };
+    placePause();
+    window.addEventListener('resize', placePause);
+    if (window.ResizeObserver && hud) new ResizeObserver(placePause).observe(hud);
     window.addEventListener('blur', () => {
       root.querySelectorAll('[data-hold], [data-tap]').forEach(btn => up(btn));
       ['left','right','up','down','z','x','c'].forEach(key => { if (window.keys) window.keys[key] = false; });
@@ -13069,21 +13251,31 @@ requestAnimationFrame(loop);
 @keyframes terminalShake{0%{transform:translate(0,0) skewX(-.5deg)}25%{transform:translate(3px,-2px) skewX(.8deg)}50%{transform:translate(-4px,1px) skewX(-1deg)}75%{transform:translate(1px,3px) skewX(.4deg)}100%{transform:translate(-1px,-1px) skewX(-.5deg)}}
 @keyframes gateBloom{from{filter:brightness(.8)}to{filter:brightness(1.4)}}
 
-/* Mobile play profile: touch controls only appear when selected in Options. */
-#muyuu-touch-controls{display:none;position:fixed;z-index:5000;inset:auto 0 max(12px,env(safe-area-inset-bottom)) 0;pointer-events:none;justify-content:space-between;align-items:flex-end;padding:0 14px;box-sizing:border-box;gap:10px;touch-action:none;user-select:none;-webkit-user-select:none}
+/* Mobile controls v40: larger hit targets, jump + boost on right, pause beneath left HUD. */
+#muyuu-touch-controls{display:none;position:fixed;z-index:5000;inset:auto 0 max(8px,env(safe-area-inset-bottom)) 0;pointer-events:none;justify-content:space-between;align-items:flex-end;padding:0 12px;box-sizing:border-box;gap:12px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 html[data-control-mode="mobile"] #muyuu-touch-controls{display:flex}
 html[data-control-mode="mobile"] #gameCanvas{touch-action:none}
-.touch-cluster{display:grid;gap:8px;pointer-events:auto;touch-action:none}
-.touch-move{grid-template-columns:repeat(2,minmax(48px, min(15vw,72px)));grid-template-rows:repeat(2,minmax(48px,min(15vw,72px)))}
-.touch-actions{grid-template-columns:repeat(2,minmax(58px,min(18vw,88px)));grid-template-rows:repeat(3,minmax(42px,min(11vw,58px)))}
-#muyuu-touch-controls button{pointer-events:auto;position:relative;z-index:1;border:1px solid rgba(125,211,252,.7);border-radius:14px;background:rgba(5,16,31,.76);color:#e5f7ff;font:800 clamp(10px,2.5vw,14px) system-ui,sans-serif;box-shadow:0 3px 12px #0008,inset 0 0 16px #38bdf822;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);touch-action:none;min-width:0;padding:5px}
-#muyuu-touch-controls button.active,#muyuu-touch-controls button:active{background:rgba(14,165,233,.8);transform:scale(.96);border-color:#fff}
+.touch-cluster{display:grid;gap:8px;pointer-events:auto;touch-action:none;align-content:end}
+.touch-move{grid-template-columns:repeat(2,clamp(70px,8.5vw,98px));grid-template-rows:repeat(2,clamp(62px,11vh,84px))}
+.touch-move [data-hold="down"]{grid-column:1 / 3;justify-self:center;width:54%}
+.touch-actions{grid-template-columns:repeat(2,clamp(72px,9vw,104px));grid-auto-rows:clamp(58px,11vh,82px)}
+#muyuu-touch-controls button{pointer-events:auto;position:relative;z-index:1;border:1px solid rgba(125,211,252,.78);border-radius:15px;background:rgba(5,16,31,.84);color:#e5f7ff;font:900 clamp(12px,2.3vw,16px)/1.15 system-ui,sans-serif;letter-spacing:.02em;box-shadow:0 4px 14px #0009,inset 0 0 18px #38bdf822;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);touch-action:none;min-width:0;min-height:58px;padding:7px 5px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+#muyuu-touch-controls button.active,#muyuu-touch-controls button:active{background:rgba(14,165,233,.88);transform:scale(.97);border-color:#fff}
+#muyuu-touch-controls button[hidden]{display:none!important}
+#muyuu-mobile-pause{position:fixed!important;left:12px;top:var(--muyuu-pause-top,180px);width:76px;height:58px;z-index:5002;font-size:14px!important;background:rgba(5,16,31,.9)!important;border-color:#fcd34d!important;color:#fff1b8!important}
 html[data-control-mode="mobile"] body{overscroll-behavior:none}
-@media (orientation:portrait) and (max-width:900px){html[data-control-mode="mobile"] #muyuu-touch-controls{display:none!important}}
+@media (orientation:portrait) and (max-width:900px){html[data-control-mode="mobile"] #muyuu-touch-controls{display:none!important}html[data-control-mode="mobile"] #muyuu-mobile-pause{display:none!important}}
+@media(max-height:430px){.touch-cluster{gap:5px}.touch-move{grid-template-rows:repeat(2,58px)}.touch-actions{grid-auto-rows:54px}#muyuu-touch-controls button{min-height:54px;border-radius:12px}#muyuu-mobile-pause{height:50px;width:68px}}
 </style>
 <div id="muyuu-touch-controls" aria-label="スマホ操作" aria-hidden="true">
-  <div class="touch-cluster touch-move"><button data-hold="left" aria-label="左へ">◀</button><button data-hold="right" aria-label="右へ">▶</button><button data-hold="up" aria-label="ジャンプ">▲</button><button data-hold="down" aria-label="下へ">▼</button></div>
-  <div class="touch-cluster touch-actions"><button data-hold="z" aria-label="攻撃">ATTACK</button><button data-hold="charge" aria-label="チャージ">CHARGE</button><button data-tap="x" aria-label="特殊攻撃">SKILL</button><button data-tap="f" aria-label="会話・調べる">INTERACT</button><button data-tap="k" aria-label="カード編成">CARD</button><button data-tap="i" aria-label="インベントリ">BAG</button><button data-tap="escape" aria-label="ポーズ">Ⅱ</button></div>
+  <div class="touch-cluster touch-move"><button data-hold="left" aria-label="左へ">◀ LEFT</button><button data-hold="right" aria-label="右へ">RIGHT ▶</button><button data-hold="down" aria-label="下へ・足場を降りる">▼ DOWN</button></div>
+  <div class="touch-cluster touch-actions">
+    <button data-hold="up" aria-label="ジャンプ">JUMP ▲</button><button data-hold="z" aria-label="攻撃">ATTACK</button>
+    <button data-hold="shift" aria-label="通常ブースト">BOOST</button><button data-tap="e" aria-label="次の武器へ切り替え">CHANGE ⇥</button>
+    <button data-tap="f" aria-label="会話・調べる">INTERACT</button><button data-tap="k" aria-label="カード編成">CARD</button>
+    <button data-tap="i" aria-label="インベントリ">BAG</button><button data-hold="charge" aria-label="Archangeチャージ" id="muyuu-charge-button" hidden>CHARGE</button>
+    <button data-tap="escape" aria-label="ポーズ" id="muyuu-mobile-pause">Ⅱ PAUSE</button>
+  </div>
 </div>
 <!-- STARTUP DEVICE GATE v34 / CSS fallback + orientation warning + platform choice -->
 <style>
@@ -13247,7 +13439,20 @@ html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
 #card-menu .part-piece { cursor: pointer; transition: border-color .12s, background .12s, transform .12s; }
 #card-menu .part-piece.selected { outline: 2px solid #fef08a; outline-offset: 1px; box-shadow: 0 0 0 3px #facc1528, 0 0 18px #facc1530; }
 #card-menu .craft-cell { min-height: 34px; }
-#card-menu .craft-cell.ghost { background-color: rgba(250,204,21,.1); }
+#card-menu .craft-cell.ghost { background: rgba(250,204,21,.17); outline: 3px solid #facc15; outline-offset: -4px; z-index: 1; }
+#card-menu .craft-cell.invalid { background: rgba(251,113,133,.22); outline: 3px solid #fb7185; }
+#card-menu .craft-cell.cursor-cell { box-shadow: inset 0 0 0 3px #67e8f9, 0 0 12px #22d3ee55; }
+#card-menu .craft-cell .cell-part.ghost-part { opacity: 1!important; border: 2px solid #fff7ad!important; outline: 2px solid #facc15; box-shadow: 0 0 12px #facc15a8; filter: saturate(1.25) brightness(1.1); }
+#card-menu .craft-cell .cell-part.active-piece { text-shadow: 0 1px 2px #fff; }
+#card-menu .craft-cursor-mark { position:absolute; inset:0; display:grid; place-items:center; z-index:5; color:#a5f3fc; font-size:clamp(18px,3vw,29px); font-weight:900; text-shadow:0 0 7px #000,0 0 12px #22d3ee; pointer-events:none; }
+#card-menu .craft-nudge-controls { display:none; grid-template-columns:repeat(3,minmax(48px,64px)); justify-content:center; align-items:center; gap:6px; margin:10px auto 4px; }
+#card-menu .craft-nudge-controls button { min-height:48px; font-size:18px; border-color:#22d3ee66; background:#0b2433; }
+#card-menu .craft-nudge-controls button[data-craft-move="0,-1"] { grid-column:2; }
+#card-menu .craft-nudge-controls button[data-craft-move="-1,0"] { grid-column:1; grid-row:2; }
+#card-menu .craft-nudge-controls button[data-craft-move="0,1"] { grid-column:2; grid-row:2; }
+#card-menu .craft-nudge-controls button[data-craft-move="1,0"] { grid-column:3; grid-row:2; }
+#card-menu .craft-cursor-status { grid-column:1/-1; color:#8cecf6; text-align:center; font:600 11px/1.4 monospace; padding:2px; }
+#card-menu .part-color-label { display:block; color:var(--part-color); font-size:9px; line-height:1.25; }
 #card-menu .card-message { overflow-wrap: anywhere; }
 @media (max-width: 820px) {
   #card-menu { padding: 0; align-items: stretch; }
@@ -13267,6 +13472,9 @@ html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
   #card-menu .craft-cell { min-height: 0; aspect-ratio: 1; }
   #card-menu .craft-cell .cell-effect { font-size: 8px; }
   #card-menu .craft-cell .cell-part { font-size: clamp(10px, 2.6vw, 15px); }
+  #card-menu .craft-cursor-mark { font-size:clamp(22px,6vw,34px); }
+  #card-menu .craft-nudge-controls button { min-height:54px; font-size:22px; }
+  #card-menu .craft-nudge-controls { display:grid; }
   #card-menu .craft-board + .card-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; }
   #card-menu .craft-board + .card-row .card-small-btn { min-height: 44px; padding: 10px 8px; }
   #card-menu .part-palette { grid-template-columns: repeat(2, minmax(0,1fr)); max-height: min(32dvh, 300px); gap: 7px; }
@@ -13281,7 +13489,13 @@ html,body{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
   #card-menu .part-piece:active, #card-menu .craft-cell:active,
   #card-menu .card-btn:active, #card-menu .card-tab:active,
   #card-menu .card-small-btn:active { transform: scale(.985); }
+  #card-menu .craft-nudge-controls { display:grid; }
 }
+html[data-control-mode="mobile"] #card-menu .craft-nudge-controls { display:grid; }
+html[data-control-mode="mobile"] #card-menu .card-layout,
+html[data-control-mode="mobile"] #card-menu .craft-layout { grid-template-columns:minmax(0,1fr); }
+html[data-control-mode="mobile"] #card-menu .craft-board { width:min(100%,540px); max-width:540px; margin-left:auto; margin-right:auto; gap:3px; }
+html[data-control-mode="mobile"] #card-menu .craft-nudge-controls button { min-height:54px; min-width:54px; font-size:22px; }
 
 html[data-control-mode="mobile"] .touch-actions { grid-template-rows: repeat(4,minmax(42px,min(11vw,58px))); }
 html[data-control-mode="mobile"] .touch-actions button[data-tap="escape"] { grid-column: 1 / -1; width: min(88px,100%); justify-self: center; }
